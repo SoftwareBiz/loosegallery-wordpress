@@ -27,7 +27,6 @@ class LG_Product_Meta {
     public function __construct() {
         add_action('add_meta_boxes', array($this, 'add_meta_box'));
         add_action('woocommerce_process_product_meta', array($this, 'save_meta_box'));
-        add_action('woocommerce_product_options_general_product_data', array($this, 'add_product_tab_content'));
     }
 
     /**
