@@ -278,7 +278,8 @@ class LG_API {
         $args = array(
             'method' => 'POST',
             'headers' => array(
-                'x-api-key' => $this->api_key,  // AWS API Gateway uses x-api-key header
+                'Authorization' => $this->api_key,  // Lambda authorizer expects Authorization header
+                'x-api-key' => $this->api_key,      // Also include x-api-key for API Gateway
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ),
