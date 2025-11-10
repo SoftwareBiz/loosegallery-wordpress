@@ -79,21 +79,24 @@ class LG_Product_Meta {
                             foreach ($api_keys as $index => $api_key) {
                                 if (empty($api_key)) continue;
                                 
-                                // Get domain info from API
-                                $api = new LG_API($api_key);
-                                $domain_info = $api->get_domain_info();
+                                // Extract domain ID from API key (first 9 characters)
+                                $domain_id = substr($api_key, 0, 9);
+                                $domain_name = "Domain " . ($index + 1);
                                 
-                                if ($domain_info['success']) {
-                                    $domain_id = $domain_info['domain_id'] ?? '';
-                                    $domain_name = $domain_info['domain_name'] ?? "Domain $index";
-                                    ?>
-                                    <option value="<?php echo esc_attr($domain_id); ?>" 
-                                            data-api-key="<?php echo esc_attr($api_key); ?>"
-                                            <?php selected($selected_domain, $domain_id); ?>>
-                                        <?php echo esc_html($domain_name); ?>
-                                    </option>
-                                    <?php
+                                // Optionally test connection to get more info
+                                $api = new LG_API($api_key);
+                                $test_result = $api->test_connection();
+                                
+                                if ($test_result['success']) {
+                                    $domain_name = "Domain " . ($index + 1) . " (" . ($test_result['total_items'] ?? 0) . " products)";
                                 }
+                                ?>
+                                <option value="<?php echo esc_attr($domain_id); ?>" 
+                                        data-api-key="<?php echo esc_attr($api_key); ?>"
+                                        <?php selected($selected_domain, $domain_id); ?>>
+                                    <?php echo esc_html($domain_name); ?>
+                                </option>
+                                <?php
                             }
                         } else {
                             ?>
