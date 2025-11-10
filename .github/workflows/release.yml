@@ -1,0 +1,32 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Create plugin zip
+        run: |
+          # Remove files not needed in distribution
+          rm -rf .git .github .gitignore workflow.txt "LooseGallery WordPress Plugin.docx"
+          
+          # Create zip file
+          cd ..
+          zip -r loosegallery-woocommerce.zip loosegallery-wordpress
+          mv loosegallery-woocommerce.zip loosegallery-wordpress/
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: loosegallery-woocommerce.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

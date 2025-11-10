@@ -278,7 +278,7 @@ class LG_API {
         $args = array(
             'method' => 'POST',
             'headers' => array(
-                'Authorization' => 'Bearer ' . $this->api_key,
+                'x-api-key' => $this->api_key,  // AWS API Gateway uses x-api-key header
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ),
@@ -341,7 +341,9 @@ class LG_API {
         // Handle other status codes
         $error_message = sprintf('API request failed with status %d', $status_code);
         
-        if (isset($decoded_body['message'])) {
+        if (isset($decoded_body['error'])) {
+            $error_message .= ': ' . $decoded_body['error'];
+        } elseif (isset($decoded_body['message'])) {
             $error_message = $decoded_body['message'];
         } elseif (!empty($response_body)) {
             $error_message .= ': ' . substr($response_body, 0, 200);

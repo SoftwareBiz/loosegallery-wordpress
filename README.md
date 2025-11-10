@@ -9,6 +9,7 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 - **Product Customization Settings**: Enable customization per product with template selection
 - **Flexible Styling**: Customize button text, colors, and tag appearance
 - **Domain Management**: View and test API connections with domain name display
+- **Automatic Updates**: One-click updates from GitHub releases
 
 ### Customer Features
 - **Visual Customization Tags**: "Customize Me" badges on customizable products
