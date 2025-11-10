@@ -105,6 +105,9 @@ class LooseGallery_WooCommerce {
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
 
+        // Declare WooCommerce HPOS compatibility
+        add_action('before_woocommerce_init', array($this, 'declare_hpos_compatibility'));
+
         // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
@@ -120,6 +123,15 @@ class LooseGallery_WooCommerce {
             new LG_Product_Display();
             new LG_Cart();
             new LG_Checkout();
+        }
+    }
+
+    /**
+     * Declare compatibility with WooCommerce features
+     */
+    public function declare_hpos_compatibility() {
+        if (class_exists('\Automattic\WooCommerce\Utilities\FeaturesUtil')) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
         }
     }
 
