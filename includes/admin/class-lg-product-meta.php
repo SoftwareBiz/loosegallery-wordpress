@@ -235,15 +235,14 @@ class LG_Product_Meta {
     /**
      * Get editor URL for a product
      */
-    private function get_editor_url($domain_id, $template_serial) {
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        $editor_base_url = $settings['editor_base_url'] ?? 'https://editor.loosegallery.com';
-        $return_url = $settings['return_url'] ?? home_url();
+    private function get_editor_url($domain_id, $product_serial) {
+        // Editor URL is hardcoded, return URL handled by editor
+        $editor_base_url = 'https://editor.loosegallery.com';
 
         return add_query_arg(array(
-            'domain' => $domain_id,
-            'template' => $template_serial,
-            'return_url' => urlencode($return_url)
+            'dom' => $domain_id,
+            'p' => $product_serial,
+            'create' => 'true'
         ), $editor_base_url);
     }
 }

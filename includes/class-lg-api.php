@@ -333,24 +333,21 @@ class LG_API {
      * Generate editor URL for starting a design
      * 
      * @param string $domain_id Domain ID
-     * @param string $template_serial Template serial number
-     * @param string $return_url URL to return to after editing
+     * @param string $product_serial Product serial number
+     * @param string $return_url URL to return to after editing (optional, ignored - editor handles it)
      * @param array $additional_params Additional query parameters
      * @return string
      */
-    public function get_editor_url($domain_id, $template_serial, $return_url = '', $additional_params = array()) {
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        $editor_base_url = $settings['editor_base_url'] ?? 'https://editor.loosegallery.com';
-        
-        if (empty($return_url)) {
-            $return_url = $settings['return_url'] ?? home_url();
-        }
+    public function get_editor_url($domain_id, $product_serial, $return_url = '', $additional_params = array()) {
+        // Editor URL is hardcoded
+        $editor_base_url = 'https://editor.loosegallery.com';
 
+        // Use correct parameter names for LooseGallery editor
+        // Return URL is handled by the editor itself, not passed as parameter
         $params = array_merge(array(
-            'domain' => $domain_id,
-            'template' => $template_serial,
-            'return_url' => $return_url,
-            'api_key' => $this->api_key
+            'dom' => $domain_id,           // 'dom' instead of 'domain'
+            'p' => $product_serial,         // 'p' instead of 'template'
+            'create' => 'true'              // Create mode
         ), $additional_params);
 
         return add_query_arg($params, $editor_base_url);

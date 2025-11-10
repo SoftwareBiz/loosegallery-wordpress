@@ -100,9 +100,7 @@ class LG_Admin_Settings {
             $sanitized['api_keys'] = array();
         }
 
-        // Sanitize URLs
-        $sanitized['return_url'] = isset($input['return_url']) ? esc_url_raw($input['return_url']) : home_url();
-        $sanitized['editor_base_url'] = isset($input['editor_base_url']) ? esc_url_raw($input['editor_base_url']) : 'https://editor.loosegallery.com';
+        // Editor URL and return URL are hardcoded - no need to save them
 
         // Sanitize button settings
         $sanitized['button_text'] = isset($input['button_text']) ? sanitize_text_field($input['button_text']) : 'Start Design';
@@ -306,40 +304,10 @@ class LG_Admin_Settings {
      * Render URL section
      */
     public function render_url_section() {
-        $settings = get_option('loosegallery_woocommerce_settings', array());
+        // No settings needed - editor URL and return URL are hardcoded
         ?>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="lg_return_url"><?php _e('Return URL', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="url" 
-                           id="lg_return_url" 
-                           name="loosegallery_woocommerce_settings[return_url]" 
-                           value="<?php echo esc_attr($settings['return_url'] ?? home_url()); ?>" 
-                           class="regular-text" />
-                    <p class="description">
-                        <?php _e('URL where users return after editing in LooseGallery. Default: your site home page.', 'loosegallery-woocommerce'); ?>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="lg_editor_base_url"><?php _e('Editor Base URL', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="url" 
-                           id="lg_editor_base_url" 
-                           name="loosegallery_woocommerce_settings[editor_base_url]" 
-                           value="<?php echo esc_attr($settings['editor_base_url'] ?? 'https://editor.loosegallery.com'); ?>" 
-                           class="regular-text" />
-                    <p class="description">
-                        <?php _e('Base URL for the LooseGallery editor. Default: https://editor.loosegallery.com', 'loosegallery-woocommerce'); ?>
-                    </p>
-                </td>
-            </tr>
-        </table>
+        <p><?php _e('Editor is configured to use: https://editor.loosegallery.com', 'loosegallery-woocommerce'); ?></p>
+        <p><?php _e('Return URL is configured in the editor itself.', 'loosegallery-woocommerce'); ?></p>
         <?php
     }
 
