@@ -344,7 +344,7 @@ class LG_API {
 
         // Use correct parameter names for LooseGallery editor
         // 'dom' = domain ID, 'p' = product serial (template)
-        // Return URL is handled by the editor itself, not passed as parameter
+        // 'productId' = WooCommerce product ID (editor will return this back to us)
         $params = array_merge(array(
             'dom' => $domain_id,
             'p' => $product_serial

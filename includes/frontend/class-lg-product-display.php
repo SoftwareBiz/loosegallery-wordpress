@@ -135,14 +135,11 @@ class LG_Product_Display {
         $template_serial = get_post_meta($product_id, '_lg_template_serial', true);
         $api_key = get_post_meta($product_id, '_lg_api_key', true);
 
-        // Generate editor URL
+        // Generate editor URL with product_id so editor can return it
         $api = new LG_API($api_key);
-        $return_url = add_query_arg(array(
-            'lg_return' => '1',
-            'product_id' => $product_id
-        ), get_permalink($product_id));
-
-        $editor_url = $api->get_editor_url($domain_id, $template_serial, $return_url);
+        $editor_url = $api->get_editor_url($domain_id, $template_serial, '', array(
+            'productId' => $product_id
+        ));
 
         ?>
         <div class="lg-design-button-wrapper">
@@ -175,12 +172,25 @@ class LG_Product_Display {
             return;
         }
 
-        if (!isset($_GET['product_id']) || !isset($_GET['design_serial'])) {
+        // Editor returns productSerial, but we also check design_serial for backwards compatibility
+        $design_serial = isset($_GET['productSerial']) 
+            ? sanitize_text_field($_GET['productSerial'])
+            : (isset($_GET['design_serial']) ? sanitize_text_field($_GET['design_serial']) : '');
+
+        if (empty($design_serial)) {
+            wc_add_notice(__('No design found. Please try customizing the product again.', 'loosegallery-woocommerce'), 'error');
             return;
         }
 
-        $product_id = absint($_GET['product_id']);
-        $design_serial = sanitize_text_field($_GET['design_serial']);
+        // Product ID - editor sends it as 'productId', we also check 'product_id'
+        $product_id = isset($_GET['productId']) 
+            ? absint($_GET['productId'])
+            : (isset($_GET['product_id']) ? absint($_GET['product_id']) : 0);
+
+        if (!$product_id) {
+            wc_add_notice(__('Product not found. Please try again.', 'loosegallery-woocommerce'), 'error');
+            return;
+        }
 
         // Validate design serial
         if (!LG_API::validate_serial($design_serial)) {
