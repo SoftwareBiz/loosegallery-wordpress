@@ -518,8 +518,17 @@ class LG_Admin_Settings {
 
         if ($result['success']) {
             wp_send_json_success(array(
-                'domain_name' => $result['domain_name'] ?? __('Unknown Domain', 'loosegallery-woocommerce')
+                'message' => __('API connection successful!', 'loosegallery-woocommerce'),
+                'total_items' => $result['total_items'] ?? 0
             ));
+        } else {
+            // Return detailed error information
+            wp_send_json_error(array(
+                'message' => $result['message'] ?? __('Connection failed', 'loosegallery-woocommerce'),
+                'status_code' => $result['status_code'] ?? null,
+                'raw_response' => $result['raw_response'] ?? null
+            ));
+        }
         } else {
             // Include more debug info
             $error_data = array(

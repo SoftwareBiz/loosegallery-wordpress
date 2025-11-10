@@ -377,18 +377,39 @@ class LG_API {
         $args = array(
             'method' => 'POST',
             'headers' => array(
-                'Authorization' => $this->api_key,  // Lambda authorizer expects Authorization header
-                'x-api-key' => $this->api_key,      // Also include x-api-key for API Gateway
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
+                'Authorization' => $this->api_key,
+                'Content-Type' => 'application/json'
             ),
             'body' => json_encode($body),
             'timeout' => 30,
-            'sslverify' => true
+            'sslverify' => true,
+            'data_format' => 'body'  // Prevent WordPress from URL-encoding the body
         );
+
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('LooseGallery API Request: ' . print_r(array(
+                'url' => $url,
+                'query' => $query,
+                'variables' => $variables,
+                'api_key_length' => strlen($this->api_key),
+                'api_key_first_chars' => substr($this->api_key, 0, 10) . '...',
+                'body_json' => json_encode($body),
+                'headers' => $args['headers']
+            ), true));
+        }
 
         // Make the request
         $response = wp_remote_request($url, $args);
+
+        // Debug response
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('LooseGallery API Response RAW: ' . print_r(array(
+                'status' => wp_remote_retrieve_response_code($response),
+                'headers' => wp_remote_retrieve_headers($response),
+                'body' => wp_remote_retrieve_body($response)
+            ), true));
+        }
 
         // Check for errors
         if (is_wp_error($response)) {
