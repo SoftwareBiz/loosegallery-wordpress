@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Tag background with ribbon effect -->
+  <path d="M20 30 L100 30 L110 40 L110 70 L100 80 L20 80 L10 70 L10 40 Z" fill="#ff6b6b" stroke="#d63031" stroke-width="2"/>
+  
+  <!-- Fold effect -->
+  <path d="M100 30 L110 40 L100 40 Z" fill="#d63031"/>
+  
+  <!-- Star icon -->
+  <path d="M35 50 L37 56 L43 56 L38 60 L40 66 L35 62 L30 66 L32 60 L27 56 L33 56 Z" fill="#ffffff"/>
+  
+  <!-- "Customize Me" text -->
+  <text x="60" y="60" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    CUSTOMIZE
+  </text>
+  <text x="60" y="75" font-family="Arial, sans-serif" font-size="10" font-weight="normal" fill="#ffffff" text-anchor="middle">
+    ME
+  </text>
+</svg>

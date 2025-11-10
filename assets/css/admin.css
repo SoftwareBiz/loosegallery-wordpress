@@ -1,0 +1,131 @@
+/**
+ * LooseGallery WooCommerce - Admin Styles
+ */
+
+/* Product Meta Box */
+.lg-product-meta {
+    padding: 10px 0;
+}
+
+.lg-product-meta label {
+    font-weight: 500;
+}
+
+.lg-product-meta input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.lg-product-meta select.widefat,
+.lg-product-meta input.widefat {
+    margin-top: 5px;
+}
+
+.lg-product-meta .description {
+    color: #666;
+    font-style: italic;
+}
+
+.lg-preview-info {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f0f0f1;
+    border-radius: 3px;
+}
+
+.lg-preview-info a.button {
+    margin-top: 5px;
+}
+
+/* Settings Page */
+.lg-api-keys-table {
+    width: 100%;
+}
+
+.lg-api-key-row td {
+    position: relative;
+}
+
+.lg-api-key-input {
+    width: 350px;
+    margin-right: 10px;
+}
+
+.lg-test-api-key,
+.lg-remove-api-key {
+    margin-left: 5px;
+}
+
+.lg-api-status {
+    display: inline-block;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.lg-domain-name {
+    margin-top: 5px !important;
+    color: #2271b1;
+    font-weight: 500;
+}
+
+/* Color Picker */
+.lg-color-picker {
+    max-width: 100px;
+}
+
+/* Admin Notices */
+.lg-admin-notice {
+    padding: 12px;
+    margin: 15px 0;
+    border-left: 4px solid #00a0d2;
+    background: white;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.lg-admin-notice.error {
+    border-left-color: #dc3232;
+}
+
+.lg-admin-notice.success {
+    border-left-color: #46b450;
+}
+
+/* Form Tables */
+.form-table .lg-color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-table textarea {
+    resize: vertical;
+}
+
+/* Settings Sections */
+#lg_api_section h2,
+#lg_url_section h2,
+#lg_button_section h2,
+#lg_tag_section h2,
+#lg_copyright_section h2 {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+/* Button Spacing */
+#lg-add-api-key {
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .lg-api-key-input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .lg-test-api-key,
+    .lg-remove-api-key {
+        display: block;
+        margin: 5px 0;
+    }
+}
