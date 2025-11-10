@@ -236,8 +236,8 @@ class LG_Product_Meta {
      * Get editor URL for a product
      */
     private function get_editor_url($domain_id, $product_serial) {
-        // Editor URL is hardcoded, return URL handled by editor
-        $editor_base_url = 'https://editor.loosegallery.com';
+        // Editor URL with correct path
+        $editor_base_url = 'https://editor.loosegallery.com/editor/';
 
         return add_query_arg(array(
             'dom' => $domain_id,

@@ -333,17 +333,17 @@ class LG_API {
      * Generate editor URL for starting a design
      * 
      * @param string $domain_id Domain ID
-     * @param string $product_serial Product serial number
+     * @param string $product_serial Product serial number (template ID)
      * @param string $return_url URL to return to after editing (optional, ignored - editor handles it)
      * @param array $additional_params Additional query parameters
      * @return string
      */
     public function get_editor_url($domain_id, $product_serial, $return_url = '', $additional_params = array()) {
-        // Editor URL is hardcoded
-        $editor_base_url = 'https://editor.loosegallery.com';
+        // Editor URL with correct path
+        $editor_base_url = 'https://editor.loosegallery.com/editor/';
 
         // Use correct parameter names for LooseGallery editor
-        // 'dom' = domain ID, 'p' = product serial
+        // 'dom' = domain ID, 'p' = product serial (template)
         // Return URL is handled by the editor itself, not passed as parameter
         $params = array_merge(array(
             'dom' => $domain_id,
