@@ -83,18 +83,13 @@ class LG_Product_Meta {
                                 $domain_id = substr($api_key, 0, 9);
                                 $domain_name = "Domain " . ($index + 1);
                                 
-                                // Optionally test connection to get more info
-                                $api = new LG_API($api_key);
-                                $test_result = $api->test_connection();
-                                
-                                if ($test_result['success']) {
-                                    $domain_name = "Domain " . ($index + 1) . " (" . ($test_result['total_items'] ?? 0) . " products)";
-                                }
+                                // Don't test connection here - too slow for product edit page
+                                // Just show domain ID
                                 ?>
                                 <option value="<?php echo esc_attr($domain_id); ?>" 
                                         data-api-key="<?php echo esc_attr($api_key); ?>"
                                         <?php selected($selected_domain, $domain_id); ?>>
-                                    <?php echo esc_html($domain_name); ?>
+                                    <?php echo esc_html($domain_name . ' (' . $domain_id . ')'); ?>
                                 </option>
                                 <?php
                             }
