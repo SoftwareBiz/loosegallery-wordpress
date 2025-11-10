@@ -248,13 +248,21 @@ class LG_Admin_Settings {
                                 $domainName.text('<?php _e('Domain:', 'loosegallery-woocommerce'); ?> ' + response.data.domain_name);
                             }
                         } else {
-                            $status.html('<span style="color: #dc3232;">✗ ' + response.data.message + '</span>');
+                            var errorMsg = response.data.message || '<?php _e('Connection failed', 'loosegallery-woocommerce'); ?>';
+                            if (response.data.status_code) {
+                                errorMsg += ' (Status: ' + response.data.status_code + ')';
+                            }
+                            $status.html('<span style="color: #dc3232;">✗ ' + errorMsg + '</span>');
                             $domainName.text('');
+                            
+                            // Log full error to console
+                            console.error('LooseGallery API Error:', response.data);
                         }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
                         $status.html('<span style="color: #dc3232;">✗ <?php _e('Connection failed', 'loosegallery-woocommerce'); ?></span>');
                         $domainName.text('');
+                        console.error('AJAX Error:', {xhr: xhr, status: status, error: error});
                     },
                     complete: function() {
                         $button.prop('disabled', false).text('<?php _e('Test Connection', 'loosegallery-woocommerce'); ?>');
@@ -513,9 +521,20 @@ class LG_Admin_Settings {
                 'domain_name' => $result['domain_name'] ?? __('Unknown Domain', 'loosegallery-woocommerce')
             ));
         } else {
-            wp_send_json_error(array(
+            // Include more debug info
+            $error_data = array(
                 'message' => $result['message'] ?? __('Connection failed', 'loosegallery-woocommerce')
-            ));
+            );
+            
+            // Add debug info if available
+            if (isset($result['status_code'])) {
+                $error_data['status_code'] = $result['status_code'];
+            }
+            if (isset($result['raw_response']) && defined('WP_DEBUG') && WP_DEBUG) {
+                $error_data['raw_response'] = substr($result['raw_response'], 0, 500);
+            }
+            
+            wp_send_json_error($error_data);
         }
     }
 }

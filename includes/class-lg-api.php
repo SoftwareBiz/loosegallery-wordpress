@@ -294,29 +294,43 @@ class LG_API {
         if (is_wp_error($response)) {
             return array(
                 'success' => false,
-                'message' => $response->get_error_message()
+                'message' => $response->get_error_message(),
+                'debug' => array(
+                    'url' => $url,
+                    'has_api_key' => !empty($this->api_key)
+                )
             );
         }
 
         $status_code = wp_remote_retrieve_response_code($response);
-        $body = wp_remote_retrieve_body($response);
-        $decoded_body = json_decode($body, true);
+        $response_body = wp_remote_retrieve_body($response);
+        $decoded_body = json_decode($response_body, true);
 
-        // GraphQL returns 200 even for errors, check for 'errors' field
+        // Log for debugging (only in development)
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('LooseGallery API Response: ' . print_r(array(
+                'status' => $status_code,
+                'body' => $response_body,
+                'decoded' => $decoded_body
+            ), true));
+        }
+
+        // Check for GraphQL errors first
+        if (isset($decoded_body['errors']) && !empty($decoded_body['errors'])) {
+            $error_messages = array_map(function($error) {
+                return $error['message'] ?? 'Unknown error';
+            }, $decoded_body['errors']);
+            
+            return array(
+                'success' => false,
+                'message' => implode(', ', $error_messages),
+                'errors' => $decoded_body['errors'],
+                'status_code' => $status_code
+            );
+        }
+
+        // GraphQL success with data
         if ($status_code === 200 && isset($decoded_body['data'])) {
-            // Check for GraphQL errors
-            if (isset($decoded_body['errors']) && !empty($decoded_body['errors'])) {
-                $error_messages = array_map(function($error) {
-                    return $error['message'] ?? 'Unknown error';
-                }, $decoded_body['errors']);
-                
-                return array(
-                    'success' => false,
-                    'message' => implode(', ', $error_messages),
-                    'errors' => $decoded_body['errors']
-                );
-            }
-
             return array(
                 'success' => true,
                 'data' => $decoded_body['data'],
@@ -324,22 +338,20 @@ class LG_API {
             );
         }
 
-        // Error response
-        $error_message = 'API request failed';
-        if (isset($decoded_body['errors']) && !empty($decoded_body['errors'])) {
-            $error_messages = array_map(function($error) {
-                return $error['message'] ?? 'Unknown error';
-            }, $decoded_body['errors']);
-            $error_message = implode(', ', $error_messages);
-        } elseif (isset($decoded_body['message'])) {
+        // Handle other status codes
+        $error_message = sprintf('API request failed with status %d', $status_code);
+        
+        if (isset($decoded_body['message'])) {
             $error_message = $decoded_body['message'];
+        } elseif (!empty($response_body)) {
+            $error_message .= ': ' . substr($response_body, 0, 200);
         }
 
         return array(
             'success' => false,
             'message' => $error_message,
             'status_code' => $status_code,
-            'data' => $decoded_body
+            'raw_response' => $response_body
         );
     }
 
