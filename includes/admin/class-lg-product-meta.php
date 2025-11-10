@@ -207,15 +207,13 @@ class LG_Product_Meta {
             $settings = get_option('loosegallery_woocommerce_settings', array());
             $api_keys = isset($settings['api_keys']) ? $settings['api_keys'] : array();
             
+            // Match domain ID (first 9 chars of API key) with the selected domain
             foreach ($api_keys as $api_key) {
                 if (empty($api_key)) continue;
                 
-                $api = new LG_API($api_key);
-                $domain_info = $api->get_domain_info();
+                $domain_id_from_key = substr($api_key, 0, 9);
                 
-                if ($domain_info['success'] && 
-                    isset($domain_info['domain_id']) && 
-                    $domain_info['domain_id'] === $_POST['lg_domain_id']) {
+                if ($domain_id_from_key === $_POST['lg_domain_id']) {
                     update_post_meta($post_id, '_lg_api_key', $api_key);
                     break;
                 }
