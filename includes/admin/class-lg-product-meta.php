@@ -13,6 +13,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Temporary error logging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', WP_CONTENT_DIR . '/debug.log');
+
 class LG_Product_Meta {
 
     /**
@@ -42,6 +48,7 @@ class LG_Product_Meta {
      * Render meta box content
      */
     public function render_meta_box($post) {
+        try {
         // Add nonce for security
         wp_nonce_field('loosegallery_product_meta', 'loosegallery_product_meta_nonce');
 
@@ -166,6 +173,11 @@ class LG_Product_Meta {
         });
         </script>
         <?php
+        } catch (Exception $e) {
+            echo '<div class="error"><p>Error: ' . esc_html($e->getMessage()) . '</p>';
+            echo '<pre>' . esc_html($e->getTraceAsString()) . '</pre></div>';
+            error_log('LooseGallery Product Meta Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
     }
 
     /**
