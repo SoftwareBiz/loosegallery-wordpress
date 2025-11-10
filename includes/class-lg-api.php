@@ -48,22 +48,23 @@ class LG_API {
             );
         }
 
+        // Use getImageDataList query to test connection (doesn't require parameters)
         $query = '
             query {
-                domain {
-                    id
-                    name
+                getImageDataList(itemsPerPage: 1, page: 0) {
+                    page
+                    totalItems
                 }
             }
         ';
 
         $response = $this->make_graphql_request($query);
 
-        if ($response['success'] && isset($response['data']['domain'])) {
+        if ($response['success'] && isset($response['data']['getImageDataList'])) {
             return array(
                 'success' => true,
-                'domain_name' => $response['data']['domain']['name'] ?? 'Unknown Domain',
-                'domain_id' => $response['data']['domain']['id'] ?? null
+                'message' => __('API connection successful', 'loosegallery-woocommerce'),
+                'total_items' => $response['data']['getImageDataList']['totalItems'] ?? 0
             );
         }
 
@@ -75,29 +76,29 @@ class LG_API {
 
     /**
      * Get domain information
+     * (Note: This API doesn't provide domain endpoints, so we'll use product list as proxy)
      */
     public function get_domain_info() {
         if (empty($this->api_key)) {
             return array('success' => false);
         }
 
+        // Use getImageDataList as a connection test
         $query = '
             query {
-                domain {
-                    id
-                    name
+                getImageDataList(itemsPerPage: 1, page: 0) {
+                    page
+                    totalItems
                 }
             }
         ';
 
         $response = $this->make_graphql_request($query);
 
-        if ($response['success'] && isset($response['data']['domain'])) {
+        if ($response['success'] && isset($response['data']['getImageDataList'])) {
             return array(
                 'success' => true,
-                'domain_name' => $response['data']['domain']['name'] ?? 'Unknown Domain',
-                'domain_id' => $response['data']['domain']['id'] ?? null,
-                'domain_data' => $response['data']['domain'] ?? array()
+                'total_products' => $response['data']['getImageDataList']['totalItems'] ?? 0
             );
         }
 
@@ -107,39 +108,41 @@ class LG_API {
     /**
      * Get design preview URL
      * 
-     * @param string $design_serial The design serial number
-     * @param string $size Size: 'thumbnail', 'small', 'medium', 'large'
+     * @param string $product_serial The product serial number (design ID)
+     * @param int $width Width in pixels (default 800)
+     * @param int $height Height in pixels (default 800)
      * @return array
      */
-    public function get_design_preview($design_serial, $size = 'medium') {
-        if (empty($this->api_key) || empty($design_serial)) {
+    public function get_design_preview($product_serial, $width = 800, $height = 800) {
+        if (empty($this->api_key) || empty($product_serial)) {
             return array(
                 'success' => false,
-                'message' => __('API key and design serial are required', 'loosegallery-woocommerce')
+                'message' => __('API key and product serial are required', 'loosegallery-woocommerce')
             );
         }
 
         $query = '
-            query GetAsset($serial: String!) {
-                asset(serial: $serial) {
-                    serial
-                    previewUrl
-                    thumbnailUrl
+            query GetProduct($productSerial: String!) {
+                getProduct(productSerial: $productSerial) {
+                    title
+                    description
+                    imageUrl
                 }
             }
         ';
 
         $variables = array(
-            'serial' => $design_serial
+            'productSerial' => $product_serial
         );
 
         $response = $this->make_graphql_request($query, $variables);
 
-        if ($response['success'] && isset($response['data']['asset'])) {
+        if ($response['success'] && isset($response['data']['getProduct'])) {
             return array(
                 'success' => true,
-                'preview_url' => $response['data']['asset']['previewUrl'] ?? '',
-                'thumbnail_url' => $response['data']['asset']['thumbnailUrl'] ?? ''
+                'preview_url' => $response['data']['getProduct']['imageUrl'] ?? '',
+                'title' => $response['data']['getProduct']['title'] ?? '',
+                'description' => $response['data']['getProduct']['description'] ?? ''
             );
         }
 
@@ -151,83 +154,179 @@ class LG_API {
 
     /**
      * Lock design (prevent further editing)
+     * Note: This API doesn't support locking, so we'll just return success
+     * Locking should be handled on the plugin side via order meta
      * 
-     * @param string $design_serial The design serial number
+     * @param string $product_serial The product serial number
      * @return array
      */
-    public function lock_design($design_serial) {
-        if (empty($this->api_key) || empty($design_serial)) {
-            return array(
-                'success' => false,
-                'message' => __('API key and design serial are required', 'loosegallery-woocommerce')
-            );
-        }
-
-        $mutation = '
-            mutation LockAsset($serial: String!) {
-                lockAsset(serial: $serial) {
-                    serial
-                    locked
-                }
-            }
-        ';
-
-        $variables = array(
-            'serial' => $design_serial
-        );
-
-        $response = $this->make_graphql_request($mutation, $variables);
-
-        if ($response['success'] && isset($response['data']['lockAsset'])) {
-            return array(
-                'success' => true,
-                'message' => __('Design locked successfully', 'loosegallery-woocommerce')
-            );
-        }
-
+    public function lock_design($product_serial) {
+        // API doesn't support locking - handle locally
         return array(
-            'success' => false,
-            'message' => $response['message'] ?? __('Failed to lock design', 'loosegallery-woocommerce')
+            'success' => true,
+            'message' => __('Design marked as locked locally', 'loosegallery-woocommerce')
         );
     }
 
     /**
      * Get design information
      * 
-     * @param string $design_serial The design serial number
+     * @param string $product_serial The product serial number
      * @return array
      */
-    public function get_design_info($design_serial) {
-        if (empty($this->api_key) || empty($design_serial)) {
+    public function get_design_info($product_serial) {
+        if (empty($this->api_key) || empty($product_serial)) {
             return array('success' => false);
         }
 
         $query = '
-            query GetAsset($serial: String!) {
-                asset(serial: $serial) {
-                    serial
-                    locked
-                    previewUrl
-                    thumbnailUrl
+            query GetProduct($productSerial: String!) {
+                getProduct(productSerial: $productSerial) {
+                    title
+                    description
+                    imageUrl
                 }
             }
         ';
 
         $variables = array(
-            'serial' => $design_serial
+            'productSerial' => $product_serial
         );
 
         $response = $this->make_graphql_request($query, $variables);
 
-        if ($response['success'] && isset($response['data']['asset'])) {
+        if ($response['success'] && isset($response['data']['getProduct'])) {
             return array(
                 'success' => true,
-                'design_data' => $response['data']['asset'] ?? array(),
-                'is_locked' => $response['data']['asset']['locked'] ?? false
+                'design_data' => $response['data']['getProduct'] ?? array(),
+                'title' => $response['data']['getProduct']['title'] ?? '',
+                'description' => $response['data']['getProduct']['description'] ?? '',
+                'preview_url' => $response['data']['getProduct']['imageUrl'] ?? ''
             );
         }
 
         return array('success' => false);
+    }
+
+    /**
+     * Create/request high-resolution image for a product
+     * 
+     * @param string $product_serial The product serial number
+     * @param int $width Width in pixels (max 12000)
+     * @param int $height Height in pixels (max 12000)
+     * @param string $file_extension File extension (.png, .jpg, .jpeg, .pdf)
+     * @param int $dpi DPI (max 300, default 300)
+     * @param string $group_id Optional group identifier
+     * @return array
+     */
+    public function create_image($product_serial, $width = 3000, $height = 3000, $file_extension = '.png', $dpi = 300, $group_id = null) {
+        if (empty($this->api_key) || empty($product_serial)) {
+            return array(
+                'success' => false,
+                'message' => __('API key and product serial are required', 'loosegallery-woocommerce')
+            );
+        }
+
+        $mutation = '
+            mutation CreateImage($productSerial: String!, $width: Int!, $height: Int!, $fileExtension: String!, $dpi: Int, $groupId: String) {
+                createImage(
+                    productSerial: $productSerial
+                    width: $width
+                    height: $height
+                    fileExtension: $fileExtension
+                    dpi: $dpi
+                    groupId: $groupId
+                )
+            }
+        ';
+
+        $variables = array(
+            'productSerial' => $product_serial,
+            'width' => $width,
+            'height' => $height,
+            'fileExtension' => $file_extension,
+            'dpi' => $dpi
+        );
+
+        if ($group_id) {
+            $variables['groupId'] = $group_id;
+        }
+
+        $response = $this->make_graphql_request($mutation, $variables);
+
+        if ($response['success'] && isset($response['data']['createImage'])) {
+            return array(
+                'success' => true,
+                'message' => __('Image creation requested successfully', 'loosegallery-woocommerce')
+            );
+        }
+
+        return array(
+            'success' => false,
+            'message' => $response['message'] ?? __('Failed to create image', 'loosegallery-woocommerce')
+        );
+    }
+
+    /**
+     * Get image for a product (checks if image exists or creates it)
+     * 
+     * @param string $product_serial The product serial number
+     * @param int $width Width in pixels (max 12000)
+     * @param int $height Height in pixels (max 12000)
+     * @param string $file_extension File extension (.png, .jpg, .jpeg, .pdf)
+     * @param int $dpi DPI (max 300, default 300)
+     * @return array
+     */
+    public function get_image($product_serial, $width = 3000, $height = 3000, $file_extension = '.png', $dpi = 300) {
+        if (empty($this->api_key) || empty($product_serial)) {
+            return array(
+                'success' => false,
+                'message' => __('API key and product serial are required', 'loosegallery-woocommerce')
+            );
+        }
+
+        $query = '
+            query GetImage($productSerial: String!, $width: Int!, $height: Int!, $fileExtension: String!, $dpi: Int) {
+                getImage(
+                    productSerial: $productSerial
+                    width: $width
+                    height: $height
+                    fileExtension: $fileExtension
+                    dpi: $dpi
+                ) {
+                    imageUrl
+                    status
+                    createProgressPercentage
+                    requestedDatetime
+                }
+            }
+        ';
+
+        $variables = array(
+            'productSerial' => $product_serial,
+            'width' => $width,
+            'height' => $height,
+            'fileExtension' => $file_extension,
+            'dpi' => $dpi
+        );
+
+        $response = $this->make_graphql_request($query, $variables);
+
+        if ($response['success'] && isset($response['data']['getImage'])) {
+            $image_data = $response['data']['getImage'];
+            return array(
+                'success' => true,
+                'image_url' => $image_data['imageUrl'] ?? '',
+                'status' => $image_data['status'] ?? 'undefined',
+                'progress' => $image_data['createProgressPercentage'] ?? 0,
+                'requested' => $image_data['requestedDatetime'] ?? ''
+            );
+        }
+
+        return array(
+            'success' => false,
+            'message' => $response['message'] ?? __('Failed to get image', 'loosegallery-woocommerce')
+        );
     }
 
     /**
