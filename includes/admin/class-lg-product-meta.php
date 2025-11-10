@@ -241,8 +241,7 @@ class LG_Product_Meta {
 
         return add_query_arg(array(
             'dom' => $domain_id,
-            'p' => $product_serial,
-            'create' => 'true'
+            'p' => $product_serial
         ), $editor_base_url);
     }
 }

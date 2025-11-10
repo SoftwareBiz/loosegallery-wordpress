@@ -54,13 +54,7 @@ class LG_Admin_Settings {
             'loosegallery-settings'
         );
 
-        // URL Settings Section
-        add_settings_section(
-            'lg_url_section',
-            __('URL Configuration', 'loosegallery-woocommerce'),
-            array($this, 'render_url_section'),
-            'loosegallery-settings'
-        );
+        // URL Settings Section removed - editor URL and return URL are configured in the editor
 
         // Button Customization Section
         add_settings_section(
@@ -294,7 +288,14 @@ class LG_Admin_Settings {
                     <?php _e('Remove', 'loosegallery-woocommerce'); ?>
                 </button>
                 <span class="lg-api-status"></span>
-                <p class="description lg-domain-name"></p>
+                <?php
+                // Show the domain id extracted from API key (first 9 characters) for admin clarity
+                $domain_id = '';
+                if (!empty($api_key) && is_string($api_key)) {
+                    $domain_id = substr($api_key, 0, 9);
+                }
+                ?>
+                <p class="description lg-domain-name"><?php echo $domain_id ? esc_html(sprintf(__('Domain ID: %s', 'loosegallery-woocommerce'), $domain_id)) : ''; ?></p>
             </td>
         </tr>
         <?php
@@ -304,11 +305,8 @@ class LG_Admin_Settings {
      * Render URL section
      */
     public function render_url_section() {
-        // No settings needed - editor URL and return URL are hardcoded
-        ?>
-        <p><?php _e('Editor is configured to use: https://editor.loosegallery.com', 'loosegallery-woocommerce'); ?></p>
-        <p><?php _e('Return URL is configured in the editor itself.', 'loosegallery-woocommerce'); ?></p>
-        <?php
+        // URL section intentionally left empty. URLs are managed in the editor.
+        return;
     }
 
     /**

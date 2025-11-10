@@ -343,11 +343,11 @@ class LG_API {
         $editor_base_url = 'https://editor.loosegallery.com';
 
         // Use correct parameter names for LooseGallery editor
+        // 'dom' = domain ID, 'p' = product serial
         // Return URL is handled by the editor itself, not passed as parameter
         $params = array_merge(array(
-            'dom' => $domain_id,           // 'dom' instead of 'domain'
-            'p' => $product_serial,         // 'p' instead of 'template'
-            'create' => 'true'              // Create mode
+            'dom' => $domain_id,
+            'p' => $product_serial
         ), $additional_params);
 
         return add_query_arg($params, $editor_base_url);
