@@ -529,21 +529,5 @@ class LG_Admin_Settings {
                 'raw_response' => $result['raw_response'] ?? null
             ));
         }
-        } else {
-            // Include more debug info
-            $error_data = array(
-                'message' => $result['message'] ?? __('Connection failed', 'loosegallery-woocommerce')
-            );
-            
-            // Add debug info if available
-            if (isset($result['status_code'])) {
-                $error_data['status_code'] = $result['status_code'];
-            }
-            if (isset($result['raw_response']) && defined('WP_DEBUG') && WP_DEBUG) {
-                $error_data['raw_response'] = substr($result['raw_response'], 0, 500);
-            }
-            
-            wp_send_json_error($error_data);
-        }
     }
 }
