@@ -33,6 +33,9 @@ class LG_Product_Display {
         // Add start design button
         add_action('woocommerce_after_add_to_cart_button', array($this, 'add_design_button'));
 
+        // Hide add to cart and quantity for customizable products without design
+        add_action('woocommerce_before_add_to_cart_button', array($this, 'maybe_hide_cart_button'));
+
         // Handle return from editor
         add_action('template_redirect', array($this, 'handle_editor_return'));
 
@@ -144,6 +147,10 @@ class LG_Product_Display {
             'timestamp' => time()
         ));
 
+        // Also store in a transient as backup (lasts 1 hour)
+        // Key is based on template serial so we can retrieve it on return
+        set_transient('lg_product_' . $template_serial, $product_id, HOUR_IN_SECONDS);
+
         // Generate editor URL - NO returnTo parameter
         // The editor integration settings will have the return URL configured
         $api = new LG_API($api_key);
@@ -172,12 +179,39 @@ class LG_Product_Display {
     }
 
     /**
+     * Hide add to cart button and quantity for customizable products without design
+     */
+    public function maybe_hide_cart_button() {
+        global $product;
+        
+        if (!$product || !$this->is_customizable($product->get_id())) {
+            return;
+        }
+
+        $product_id = $product->get_id();
+        
+        // Check if user has a design for this product
+        $has_design = $this->session->has_design($product_id);
+        
+        // If no design, hide quantity and add to cart
+        if (!$has_design) {
+            ?>
+            <style>
+                .single-product .quantity,
+                .single-product .single_add_to_cart_button {
+                    display: none !important;
+                }
+            </style>
+            <?php
+        }
+    }
+
+    /**
      * Handle return from editor
-     * Matches OpenCart workflow: expects productSerial in URL, reads product from session
+     * Matches OpenCart workflow: expects productSerial in URL, reads product from session or transient
      */
     public function handle_editor_return() {
         // Check if this is a return from editor
-        // OpenCart style: just check for productSerial parameter
         $design_serial = '';
         if (isset($_GET['productSerial'])) {
             $design_serial = sanitize_text_field($_GET['productSerial']);
@@ -190,30 +224,61 @@ class LG_Product_Display {
             return;
         }
 
-        // Make sure WooCommerce session is initialized
-        if (!WC()->session) {
-            return;
-        }
-
-        // Get product data from session (stored when user clicked "Start Design")
-        $pending_product = WC()->session->get('lg_pending_product');
-        
-        if (empty($pending_product) || !isset($pending_product['product_id'])) {
-            // Session expired or not set - try to find the product another way
-            // This can happen if user bookmarked the return URL or session timed out
-            wc_add_notice(__('Session expired. Please select the product again.', 'loosegallery-woocommerce'), 'error');
+        // Validate design serial
+        if (!LG_API::validate_serial($design_serial)) {
+            wc_add_notice(__('Invalid design serial number.', 'loosegallery-woocommerce'), 'error');
             wp_safe_redirect(home_url('/shop'));
             exit;
         }
 
-        $product_id = absint($pending_product['product_id']);
-        $api_key = $pending_product['api_key'];
+        // Try to get product from session first
+        $product_id = null;
+        $api_key = null;
+        $template_serial = null;
+        
+        if (WC()->session) {
+            $pending_product = WC()->session->get('lg_pending_product');
+            
+            if (!empty($pending_product) && isset($pending_product['product_id'])) {
+                $product_id = absint($pending_product['product_id']);
+                $api_key = $pending_product['api_key'];
+                $template_serial = $pending_product['template_serial'];
+            }
+        }
 
-        // Validate design serial
-        if (!LG_API::validate_serial($design_serial)) {
-            wc_add_notice(__('Invalid design serial number.', 'loosegallery-woocommerce'), 'error');
-            WC()->session->set('lg_pending_product', null);
-            wp_safe_redirect(get_permalink($product_id));
+        // If session doesn't have it, try to find from design serial by checking all customizable products
+        if (!$product_id) {
+            $args = array(
+                'post_type' => 'product',
+                'posts_per_page' => -1,
+                'meta_query' => array(
+                    array(
+                        'key' => '_lg_is_customizable',
+                        'value' => 'yes',
+                        'compare' => '='
+                    )
+                )
+            );
+            
+            $products = get_posts($args);
+            
+            // Check transients for each product to find which one was opened
+            foreach ($products as $product) {
+                $product_template = get_post_meta($product->ID, '_lg_template_serial', true);
+                $stored_product_id = get_transient('lg_product_' . $product_template);
+                
+                if ($stored_product_id == $product->ID) {
+                    $product_id = $product->ID;
+                    $api_key = get_post_meta($product_id, '_lg_api_key', true);
+                    $template_serial = $product_template;
+                    break;
+                }
+            }
+        }
+
+        if (!$product_id || !$api_key) {
+            wc_add_notice(__('Could not find the product. Please try again.', 'loosegallery-woocommerce'), 'error');
+            wp_safe_redirect(home_url('/shop'));
             exit;
         }
 
@@ -223,7 +288,7 @@ class LG_Product_Display {
             'user_id' => get_current_user_id()
         ));
 
-        // Get preview image from API (matches OpenCart: fetch and save preview)
+        // Get preview image from API
         if ($api_key) {
             $api = new LG_API($api_key);
             $preview = $api->get_design_preview($design_serial, 'medium');
@@ -239,8 +304,13 @@ class LG_Product_Display {
             }
         }
 
-        // Clear the pending product from session
-        WC()->session->set('lg_pending_product', null);
+        // Clear the pending product from session and transient
+        if (WC()->session) {
+            WC()->session->set('lg_pending_product', null);
+        }
+        if ($template_serial) {
+            delete_transient('lg_product_' . $template_serial);
+        }
 
         // Automatically add product to cart (OpenCart workflow)
         $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
