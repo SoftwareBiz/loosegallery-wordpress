@@ -119,15 +119,20 @@ class LG_Product_Display {
         }
 
         $product_id = $product->get_id();
-        $settings = get_option('loosegallery_woocommerce_settings', array());
         
         // Check if user has already designed this product
         $has_design = $this->session->has_design($product_id);
         
+        // If user already has a design, don't show button on product page
+        // (Edit button will be in cart instead)
+        if ($has_design) {
+            return;
+        }
+        
+        $settings = get_option('loosegallery_woocommerce_settings', array());
+        
         // Get button settings
-        $button_text = $has_design 
-            ? __('Edit Your Design', 'loosegallery-woocommerce')
-            : ($settings['button_text'] ?? 'Start Design');
+        $button_text = $settings['button_text'] ?? 'LET ME LOOSE!';
         $button_color = $settings['button_color'] ?? '#000000';
         $button_font_color = $settings['button_font_color'] ?? '#ffffff';
         $button_font_size = $settings['button_font_size'] ?? 16;
@@ -158,13 +163,6 @@ class LG_Product_Display {
 
         ?>
         <div class="lg-design-button-wrapper">
-            <?php if ($has_design): ?>
-            <p class="lg-design-status">
-                <span class="lg-design-icon">✓</span>
-                <?php _e('Your custom design is ready!', 'loosegallery-woocommerce'); ?>
-            </p>
-            <?php endif; ?>
-            
             <a href="<?php echo esc_url($editor_url); ?>" 
                class="button lg-design-button" 
                style="
@@ -314,20 +312,10 @@ class LG_Product_Display {
             delete_transient('lg_product_' . $template_serial);
         }
 
-        // Automatically add product to cart (OpenCart workflow)
-        $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
-        
-        if ($cart_item_key) {
-            // Show success message
-            wc_add_notice(__('Your design has been saved and added to your cart!', 'loosegallery-woocommerce'), 'success');
-            
-            // Redirect to cart page (matches OpenCart exactly)
-            wp_safe_redirect(wc_get_cart_url());
-        } else {
-            // Failed to add to cart
-            wc_add_notice(__('Failed to add product to cart. Please try again.', 'loosegallery-woocommerce'), 'error');
-            wp_safe_redirect(get_permalink($product_id));
-        }
+        // Show success message and redirect back to product page
+        // User can then select options (size, frame, etc.) and add to cart manually
+        wc_add_notice(__('Your design has been saved! Please select your options and add to cart.', 'loosegallery-woocommerce'), 'success');
+        wp_safe_redirect(get_permalink($product_id));
         exit;
     }
 
