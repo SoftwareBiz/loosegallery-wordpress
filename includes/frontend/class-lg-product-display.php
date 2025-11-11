@@ -190,16 +190,21 @@ class LG_Product_Display {
             return;
         }
 
+        // Make sure WooCommerce session is initialized
+        if (!WC()->session) {
+            return;
+        }
+
         // Get product data from session (stored when user clicked "Start Design")
         $pending_product = WC()->session->get('lg_pending_product');
         
         if (empty($pending_product) || !isset($pending_product['product_id'])) {
-            wc_add_notice(__('Session expired. Please start designing again.', 'loosegallery-woocommerce'), 'error');
-            return;
+            // Session expired or not set - try to find the product another way
+            // This can happen if user bookmarked the return URL or session timed out
+            wc_add_notice(__('Session expired. Please select the product again.', 'loosegallery-woocommerce'), 'error');
+            wp_safe_redirect(home_url('/shop'));
+            exit;
         }
-
-        $product_id = absint($pending_product['product_id']);
-        $api_key = $pending_product['api_key'];
 
         $product_id = absint($pending_product['product_id']);
         $api_key = $pending_product['api_key'];
@@ -208,7 +213,8 @@ class LG_Product_Display {
         if (!LG_API::validate_serial($design_serial)) {
             wc_add_notice(__('Invalid design serial number.', 'loosegallery-woocommerce'), 'error');
             WC()->session->set('lg_pending_product', null);
-            return;
+            wp_safe_redirect(get_permalink($product_id));
+            exit;
         }
 
         // Save design to session
