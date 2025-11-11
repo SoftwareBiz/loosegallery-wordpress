@@ -213,46 +213,12 @@ class LG_Checkout {
 
     /**
      * Display design info in order details
+     * Note: Design serial is stored in order meta but not displayed to customer
      */
     public function display_design_in_order($item_id, $item, $order) {
-        $design_serial = $item->get_meta('_lg_design_serial');
-        $is_locked = $item->get_meta('_lg_design_locked');
-
-        if (empty($design_serial)) {
-            return;
-        }
-
-        ?>
-        <div class="lg-order-design-info">
-            <strong><?php _e('Design:', 'loosegallery-woocommerce'); ?></strong> 
-            <?php echo esc_html($design_serial); ?>
-            
-            <?php if ($is_locked === 'yes'): ?>
-                <span class="lg-design-locked-badge">
-                    🔒 <?php _e('Locked', 'loosegallery-woocommerce'); ?>
-                </span>
-            <?php endif; ?>
-        </div>
-
-        <style>
-        .lg-order-design-info {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        .lg-design-locked-badge {
-            display: inline-block;
-            margin-left: 10px;
-            padding: 2px 8px;
-            background: #46b450;
-            color: white;
-            border-radius: 3px;
-            font-size: 0.85em;
-        }
-        </style>
-        <?php
+        // Design serial is saved in order meta for printing/processing
+        // but we don't display it to the customer in order details
+        return;
     }
 
     /**

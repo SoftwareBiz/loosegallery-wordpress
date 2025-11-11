@@ -39,7 +39,10 @@ class LG_Cart {
         // Add edit design button in cart
         add_action('woocommerce_after_cart_item_name', array($this, 'add_edit_button_cart'), 10, 2);
         
-        // Add JavaScript for cart item removal warning
+        // Clear design session when item is removed from cart
+        add_action('woocommerce_remove_cart_item', array($this, 'clear_design_on_remove'), 10, 2);
+        
+        // Add removal warning for customized products
         add_action('wp_footer', array($this, 'add_removal_warning_script'));
         
         // Save design data to order
@@ -65,19 +68,10 @@ class LG_Cart {
 
     /**
      * Display design info in cart
+     * Note: Design serial is saved to order meta, but not displayed in cart/checkout
      */
     public function display_design_in_cart($item_data, $cart_item) {
-        if (isset($cart_item['lg_design_serial'])) {
-            $item_data[] = array(
-                'name' => __('Design', 'loosegallery-woocommerce'),
-                'value' => sprintf(
-                    '<span class="lg-cart-design-badge">%s</span> <small>(%s)</small>',
-                    __('Custom Design', 'loosegallery-woocommerce'),
-                    esc_html($cart_item['lg_design_serial'])
-                )
-            );
-        }
-        
+        // Don't display design info in cart - only store it for order processing
         return $item_data;
     }
 
@@ -93,11 +87,11 @@ class LG_Cart {
         $preview_url = $cart_item['lg_design_data']['preview_url'];
         $product_name = $cart_item['data']->get_name();
 
+        // Just show the image, no badge or button
         return sprintf(
-            '<div class="lg-cart-preview-wrapper"><img src="%s" alt="%s" class="lg-cart-preview" /><span class="lg-cart-preview-badge">%s</span></div>',
+            '<img src="%s" alt="%s" class="lg-cart-preview" />',
             esc_url($preview_url),
-            esc_attr($product_name),
-            esc_html__('Your Design', 'loosegallery-woocommerce')
+            esc_attr($product_name)
         );
     }
 
@@ -121,16 +115,19 @@ class LG_Cart {
             return;
         }
 
-        // Generate editor URL
-        $api = new LG_API($api_key);
-        $return_url = add_query_arg(array(
-            'lg_return' => '1',
+        // Store product data in session for editing
+        WC()->session->set('lg_pending_product', array(
             'product_id' => $product_id,
-            'from' => 'cart'
-        ), wc_get_cart_url());
+            'domain_id' => $domain_id,
+            'template_serial' => $template_serial,
+            'api_key' => $api_key,
+            'timestamp' => time()
+        ));
 
-        $editor_url = $api->get_editor_url($domain_id, $template_serial, $return_url, array(
-            'design_serial' => $cart_item['lg_design_serial']
+        // Generate editor URL with existing design serial to edit
+        $api = new LG_API($api_key);
+        $editor_url = $api->get_editor_url($domain_id, $template_serial, '', array(
+            's' => $cart_item['lg_design_serial'] // 's' parameter opens existing design for editing
         ));
 
         ?>
@@ -141,6 +138,21 @@ class LG_Cart {
             </a>
         </div>
         <?php
+    }
+
+    /**
+     * Clear design session when product is removed from cart
+     */
+    public function clear_design_on_remove($cart_item_key, $cart) {
+        // Get the cart item being removed
+        $cart_item = $cart->cart_contents[$cart_item_key];
+        
+        if (isset($cart_item['product_id']) && isset($cart_item['lg_design_serial'])) {
+            $product_id = $cart_item['product_id'];
+            
+            // Clear the design from session
+            $this->session->remove_design($product_id);
+        }
     }
 
     /**
