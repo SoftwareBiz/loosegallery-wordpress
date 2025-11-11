@@ -139,20 +139,22 @@
 
 .lg-cart-edit-wrapper {
     margin-top: 10px;
+    display: inline-block;
 }
 
 .lg-cart-edit-button {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 12px;
     background: #0073aa;
     color: white !important;
     border: none;
     border-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     text-decoration: none !important;
     cursor: pointer;
     transition: background 0.2s ease;
+    white-space: nowrap;
 }
 
 .lg-cart-edit-button:hover {
