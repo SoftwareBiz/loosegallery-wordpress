@@ -27,9 +27,8 @@ class LG_Product_Display {
     public function __construct() {
         $this->session = new LG_Session();
 
-        // Add customize me tag to product images
+        // Add customize me tag to product listings (shop/category pages)
         add_action('woocommerce_before_shop_loop_item_title', array($this, 'add_customize_tag'), 15);
-        add_action('woocommerce_before_single_product_summary', array($this, 'add_customize_tag_single'), 25);
 
         // Add start design button
         add_action('woocommerce_after_add_to_cart_button', array($this, 'add_design_button'));
