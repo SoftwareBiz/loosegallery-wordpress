@@ -135,18 +135,20 @@ class LG_Product_Display {
         $template_serial = get_post_meta($product_id, '_lg_template_serial', true);
         $api_key = get_post_meta($product_id, '_lg_api_key', true);
 
-        // Generate return URL for editor to redirect back to
-        $return_url = add_query_arg(array(
-            'lg_return' => '1',
-            'productId' => $product_id
-        ), home_url('/'));
-
-        // Generate editor URL with returnTo parameter
-        $api = new LG_API($api_key);
-        $editor_url = $api->get_editor_url($domain_id, $template_serial, '', array(
-            'productId' => $product_id,
-            'returnTo' => $return_url
+        // Store product data in session for when user returns from editor
+        // This matches the OpenCart workflow
+        WC()->session->set('lg_pending_product', array(
+            'product_id' => $product_id,
+            'domain_id' => $domain_id,
+            'template_serial' => $template_serial,
+            'api_key' => $api_key,
+            'timestamp' => time()
         ));
+
+        // Generate editor URL - NO returnTo parameter
+        // The editor integration settings will have the return URL configured
+        $api = new LG_API($api_key);
+        $editor_url = $api->get_editor_url($domain_id, $template_serial);
 
         ?>
         <div class="lg-design-button-wrapper">
@@ -172,58 +174,41 @@ class LG_Product_Display {
 
     /**
      * Handle return from editor
+     * Matches OpenCart workflow: expects productSerial in URL, reads product from session
      */
     public function handle_editor_return() {
         // Check if this is a return from editor
-        if (!isset($_GET['lg_return']) || $_GET['lg_return'] !== '1') {
-            return;
+        // OpenCart style: just check for productSerial parameter
+        $design_serial = '';
+        if (isset($_GET['productSerial'])) {
+            $design_serial = sanitize_text_field($_GET['productSerial']);
+        } elseif (isset($_GET['p'])) {
+            $design_serial = sanitize_text_field($_GET['p']);
         }
 
-        // Editor returns productSerial, but we also check design_serial for backwards compatibility
-        $design_serial = isset($_GET['productSerial']) 
-            ? sanitize_text_field($_GET['productSerial'])
-            : (isset($_GET['design_serial']) ? sanitize_text_field($_GET['design_serial']) : '');
-
+        // If no design serial, this isn't a return from editor
         if (empty($design_serial)) {
-            wc_add_notice(__('No design found. Please try customizing the product again.', 'loosegallery-woocommerce'), 'error');
             return;
         }
 
-        // Product ID - editor sends it as 'productId', we also check 'product_id'
-        $product_id = isset($_GET['productId'])
-            ? absint($_GET['productId'])
-            : (isset($_GET['product_id']) ? absint($_GET['product_id']) : 0);
-
-        // If product id is not provided, try to find a product by its template/product serial
-        if (!$product_id) {
-            // Many integrations return only the product/template serial. Try to find the product
-            // that has this serial stored in post meta '_lg_template_serial'. This provides
-            // backwards compatibility when the editor doesn't send productId.
-            $posts = get_posts(array(
-                'post_type' => 'product',
-                'posts_per_page' => 1,
-                'meta_query' => array(
-                    array(
-                        'key' => '_lg_template_serial',
-                        'value' => $design_serial,
-                        'compare' => '='
-                    )
-                )
-            ));
-
-            if (!empty($posts) && isset($posts[0]->ID)) {
-                $product_id = $posts[0]->ID;
-            }
-        }
-
-        if (!$product_id) {
-            wc_add_notice(__('Product not found. Please try again.', 'loosegallery-woocommerce'), 'error');
+        // Get product data from session (stored when user clicked "Start Design")
+        $pending_product = WC()->session->get('lg_pending_product');
+        
+        if (empty($pending_product) || !isset($pending_product['product_id'])) {
+            wc_add_notice(__('Session expired. Please start designing again.', 'loosegallery-woocommerce'), 'error');
             return;
         }
+
+        $product_id = absint($pending_product['product_id']);
+        $api_key = $pending_product['api_key'];
+
+        $product_id = absint($pending_product['product_id']);
+        $api_key = $pending_product['api_key'];
 
         // Validate design serial
         if (!LG_API::validate_serial($design_serial)) {
             wc_add_notice(__('Invalid design serial number.', 'loosegallery-woocommerce'), 'error');
+            WC()->session->set('lg_pending_product', null);
             return;
         }
 
@@ -233,8 +218,7 @@ class LG_Product_Display {
             'user_id' => get_current_user_id()
         ));
 
-        // Get preview image from API
-        $api_key = get_post_meta($product_id, '_lg_api_key', true);
+        // Get preview image from API (matches OpenCart: fetch and save preview)
         if ($api_key) {
             $api = new LG_API($api_key);
             $preview = $api->get_design_preview($design_serial, 'medium');
@@ -250,18 +234,21 @@ class LG_Product_Display {
             }
         }
 
-        // Automatically add product to cart
+        // Clear the pending product from session
+        WC()->session->set('lg_pending_product', null);
+
+        // Automatically add product to cart (OpenCart workflow)
         $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
         
         if ($cart_item_key) {
             // Show success message
             wc_add_notice(__('Your design has been saved and added to your cart!', 'loosegallery-woocommerce'), 'success');
             
-            // Redirect to cart page
+            // Redirect to cart page (matches OpenCart exactly)
             wp_safe_redirect(wc_get_cart_url());
         } else {
-            // Failed to add to cart, redirect to product page
-            wc_add_notice(__('Your design has been saved! You can now add this customized product to your cart.', 'loosegallery-woocommerce'), 'success');
+            // Failed to add to cart
+            wc_add_notice(__('Failed to add product to cart. Please try again.', 'loosegallery-woocommerce'), 'error');
             wp_safe_redirect(get_permalink($product_id));
         }
         exit;
