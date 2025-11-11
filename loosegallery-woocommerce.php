@@ -82,7 +82,6 @@ class LooseGallery_WooCommerce {
         // Core classes
         require_once LG_WC_PLUGIN_DIR . 'includes/class-lg-api.php';
         require_once LG_WC_PLUGIN_DIR . 'includes/class-lg-session.php';
-        require_once LG_WC_PLUGIN_DIR . 'includes/class-lg-updater.php';
         
         // Admin classes
         if (is_admin()) {
@@ -108,11 +107,6 @@ class LooseGallery_WooCommerce {
 
         // Declare WooCommerce HPOS compatibility
         add_action('before_woocommerce_init', array($this, 'declare_hpos_compatibility'));
-
-        // Initialize plugin updater
-        if (is_admin()) {
-            new LG_Plugin_Updater(__FILE__);
-        }
 
         // Enqueue scripts and styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
