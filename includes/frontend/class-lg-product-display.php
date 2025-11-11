@@ -198,7 +198,8 @@ class LG_Product_Display {
             ?>
             <style>
                 .single-product .quantity,
-                .single-product .single_add_to_cart_button {
+                .single-product .single_add_to_cart_button,
+                .single-product form.cart .quantity label {
                     display: none !important;
                 }
             </style>
