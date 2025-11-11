@@ -135,10 +135,17 @@ class LG_Product_Display {
         $template_serial = get_post_meta($product_id, '_lg_template_serial', true);
         $api_key = get_post_meta($product_id, '_lg_api_key', true);
 
-        // Generate editor URL with product_id so editor can return it
+        // Generate return URL for editor to redirect back to
+        $return_url = add_query_arg(array(
+            'lg_return' => '1',
+            'productId' => $product_id
+        ), home_url('/'));
+
+        // Generate editor URL with returnTo parameter
         $api = new LG_API($api_key);
         $editor_url = $api->get_editor_url($domain_id, $template_serial, '', array(
-            'productId' => $product_id
+            'productId' => $product_id,
+            'returnTo' => $return_url
         ));
 
         ?>
@@ -183,9 +190,31 @@ class LG_Product_Display {
         }
 
         // Product ID - editor sends it as 'productId', we also check 'product_id'
-        $product_id = isset($_GET['productId']) 
+        $product_id = isset($_GET['productId'])
             ? absint($_GET['productId'])
             : (isset($_GET['product_id']) ? absint($_GET['product_id']) : 0);
+
+        // If product id is not provided, try to find a product by its template/product serial
+        if (!$product_id) {
+            // Many integrations return only the product/template serial. Try to find the product
+            // that has this serial stored in post meta '_lg_template_serial'. This provides
+            // backwards compatibility when the editor doesn't send productId.
+            $posts = get_posts(array(
+                'post_type' => 'product',
+                'posts_per_page' => 1,
+                'meta_query' => array(
+                    array(
+                        'key' => '_lg_template_serial',
+                        'value' => $design_serial,
+                        'compare' => '='
+                    )
+                )
+            ));
+
+            if (!empty($posts) && isset($posts[0]->ID)) {
+                $product_id = $posts[0]->ID;
+            }
+        }
 
         if (!$product_id) {
             wc_add_notice(__('Product not found. Please try again.', 'loosegallery-woocommerce'), 'error');
@@ -221,11 +250,20 @@ class LG_Product_Display {
             }
         }
 
-        // Show success message
-        wc_add_notice(__('Your design has been saved! You can now add this customized product to your cart.', 'loosegallery-woocommerce'), 'success');
-
-        // Redirect to clean URL
-        wp_safe_redirect(get_permalink($product_id));
+        // Automatically add product to cart
+        $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
+        
+        if ($cart_item_key) {
+            // Show success message
+            wc_add_notice(__('Your design has been saved and added to your cart!', 'loosegallery-woocommerce'), 'success');
+            
+            // Redirect to cart page
+            wp_safe_redirect(wc_get_cart_url());
+        } else {
+            // Failed to add to cart, redirect to product page
+            wc_add_notice(__('Your design has been saved! You can now add this customized product to your cart.', 'loosegallery-woocommerce'), 'success');
+            wp_safe_redirect(get_permalink($product_id));
+        }
         exit;
     }
 
