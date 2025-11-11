@@ -346,36 +346,26 @@ class LG_Product_Display {
         $preview_url = $design_data['data']['preview_url'];
         $product_title = $product->get_name();
 
-        // Parse the original HTML to extract classes and structure
-        // This maintains compatibility with different gallery layouts (left thumbnail, etc.)
-        $dom = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
-        libxml_clear_errors();
-        
-        $img_tags = $dom->getElementsByTagName('img');
-        if ($img_tags->length > 0) {
-            $img = $img_tags->item(0);
-            // Replace src and srcset with design preview
-            $img->setAttribute('src', esc_url($preview_url));
-            $img->setAttribute('srcset', esc_url($preview_url));
-            $img->setAttribute('alt', esc_attr($product_title . ' - Your Design'));
-            
-            // Save modified HTML
-            $body = $dom->getElementsByTagName('body')->item(0);
-            $new_html = '';
-            foreach ($body->childNodes as $child) {
-                $new_html .= $dom->saveHTML($child);
-            }
-            return $new_html;
-        }
-
-        // Fallback if parsing fails - return original structure with replaced src
-        return preg_replace(
-            '/<img([^>]+)src=["\']([^"\']+)["\']([^>]*)>/i',
-            '<img$1src="' . esc_url($preview_url) . '"$3>',
+        // Replace src, srcset, and data-src attributes while preserving all HTML structure
+        $modified_html = preg_replace(
+            '/src=["\']([^"\']+)["\']/i',
+            'src="' . esc_url($preview_url) . '"',
             $html
         );
+        
+        $modified_html = preg_replace(
+            '/srcset=["\']([^"\']+)["\']/i',
+            'srcset="' . esc_url($preview_url) . '"',
+            $modified_html
+        );
+        
+        $modified_html = preg_replace(
+            '/data-src=["\']([^"\']+)["\']/i',
+            'data-src="' . esc_url($preview_url) . '"',
+            $modified_html
+        );
+
+        return $modified_html;
     }
 
     /**
