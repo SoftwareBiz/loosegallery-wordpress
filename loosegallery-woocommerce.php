@@ -4,8 +4,8 @@
  * Plugin URI: https://loosegallery.com
  * Description: Integrate LooseGallery design editor with WooCommerce products for custom product personalization. Uses GraphQL API.
  * Version: 1.0.1
- * Author: LooseGallery
- * Author URI: https://loosegallery.com
+ * Author: SoftwareBiz
+ * Author URI: https://softwarebiz.co
  * Text Domain: loosegallery-woocommerce
  * Domain Path: /languages
  * Requires at least: 5.8
