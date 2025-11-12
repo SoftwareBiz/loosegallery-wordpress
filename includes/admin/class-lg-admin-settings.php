@@ -71,14 +71,6 @@ class LG_Admin_Settings {
             array($this, 'render_tag_section'),
             'loosegallery-settings'
         );
-
-        // Copyright Section
-        add_settings_section(
-            'lg_copyright_section',
-            __('Copyright & Legal', 'loosegallery-woocommerce'),
-            array($this, 'render_copyright_section'),
-            'loosegallery-settings'
-        );
     }
 
     /**
@@ -107,9 +99,6 @@ class LG_Admin_Settings {
         $sanitized['tag_color'] = isset($input['tag_color']) ? sanitize_hex_color($input['tag_color']) : '#ff6b6b';
         $sanitized['tag_font_color'] = isset($input['tag_font_color']) ? sanitize_hex_color($input['tag_font_color']) : '#ffffff';
         $sanitized['tag_font_size'] = isset($input['tag_font_size']) ? absint($input['tag_font_size']) : 14;
-
-        // Sanitize copyright text
-        $sanitized['copyright_text'] = isset($input['copyright_text']) ? wp_kses_post($input['copyright_text']) : '';
 
         return $sanitized;
     }
@@ -440,28 +429,6 @@ class LG_Admin_Settings {
     /**
      * Render copyright section
      */
-    public function render_copyright_section() {
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        ?>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="lg_copyright_text"><?php _e('Copyright Agreement Text', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <textarea id="lg_copyright_text" 
-                              name="loosegallery_woocommerce_settings[copyright_text]" 
-                              rows="3" 
-                              class="large-text"><?php echo esc_textarea($settings['copyright_text'] ?? 'I agree to the copyright ownership and understand my design will be printed as is.'); ?></textarea>
-                    <p class="description">
-                        <?php _e('This text will appear as a required checkbox during checkout.', 'loosegallery-woocommerce'); ?>
-                    </p>
-                </td>
-            </tr>
-        </table>
-        <?php
-    }
-
     /**
      * AJAX: Test API connection
      */

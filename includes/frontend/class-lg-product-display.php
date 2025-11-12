@@ -238,6 +238,8 @@ class LG_Product_Display {
         $product_id = null;
         $api_key = null;
         $template_serial = null;
+        $cart_item_key = null;
+        $is_editing = false;
         
         if (WC()->session) {
             $pending_product = WC()->session->get('lg_pending_product');
@@ -246,6 +248,8 @@ class LG_Product_Display {
                 $product_id = absint($pending_product['product_id']);
                 $api_key = $pending_product['api_key'];
                 $template_serial = $pending_product['template_serial'];
+                $cart_item_key = $pending_product['cart_item_key'] ?? null;
+                $is_editing = $pending_product['editing'] ?? false;
             }
         }
 
@@ -315,10 +319,25 @@ class LG_Product_Display {
             delete_transient('lg_product_' . $template_serial);
         }
 
-        // Show success message and redirect back to product page
-        // User can then select options (size, frame, etc.) and add to cart manually
-        wc_add_notice(__('Your design has been saved! Please select your options and add to cart.', 'loosegallery-woocommerce'), 'success');
-        wp_safe_redirect(get_permalink($product_id));
+        // If we're editing an existing cart item, update it with the new design serial
+        if ($is_editing && $cart_item_key && isset(WC()->cart->cart_contents[$cart_item_key])) {
+            // Update the cart item with new design data
+            WC()->cart->cart_contents[$cart_item_key]['lg_design_serial'] = $design_serial;
+            WC()->cart->cart_contents[$cart_item_key]['lg_design_data'] = array(
+                'preview_url' => $preview['preview_url'] ?? '',
+                'thumbnail_url' => $preview['thumbnail_url'] ?? '',
+                'returned_at' => current_time('mysql'),
+                'user_id' => get_current_user_id()
+            );
+            WC()->cart->set_session();
+            
+            wc_add_notice(__('Your design has been updated!', 'loosegallery-woocommerce'), 'success');
+            wp_safe_redirect(wc_get_cart_url());
+        } else {
+            // New design - redirect to product page to select options
+            wc_add_notice(__('Your design has been saved! Please select your options and add to cart.', 'loosegallery-woocommerce'), 'success');
+            wp_safe_redirect(get_permalink($product_id));
+        }
         exit;
     }
 

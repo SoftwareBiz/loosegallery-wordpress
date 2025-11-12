@@ -3,8 +3,6 @@
  * Checkout Integration
  * 
  * Handles checkout process:
- * - Add copyright agreement checkbox
- * - Validate checkbox is checked
  * - Lock designs after successful order
  * - Display design info in order details
  */
@@ -20,12 +18,6 @@ class LG_Checkout {
      * Constructor
      */
     public function __construct() {
-        // Add copyright checkbox to checkout
-        add_action('woocommerce_review_order_before_submit', array($this, 'add_copyright_checkbox'));
-        
-        // Validate copyright checkbox
-        add_action('woocommerce_checkout_process', array($this, 'validate_copyright_checkbox'));
-        
         // Lock designs after successful order
         add_action('woocommerce_thankyou', array($this, 'lock_designs_on_order'), 10, 1);
         add_action('woocommerce_order_status_completed', array($this, 'lock_designs_on_completion'), 10, 1);
@@ -55,77 +47,6 @@ class LG_Checkout {
         }
 
         return false;
-    }
-
-    /**
-     * Add copyright agreement checkbox
-     */
-    public function add_copyright_checkbox() {
-        // Only show if cart has customized products
-        if (!$this->cart_has_designs()) {
-            return;
-        }
-
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        $copyright_text = $settings['copyright_text'] ?? 
-            __('I agree to the copyright ownership and understand my design will be printed as is.', 'loosegallery-woocommerce');
-
-        ?>
-        <div class="lg-copyright-agreement">
-            <p class="form-row terms lg-copyright-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox" 
-                           name="lg_copyright_agreement" 
-                           id="lg_copyright_agreement" 
-                           value="yes" />
-                    <span class="required">*</span> <?php echo wp_kses_post($copyright_text); ?>
-                </label>
-            </p>
-        </div>
-
-        <style>
-        .lg-copyright-agreement {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-        }
-        .lg-copyright-checkbox {
-            margin: 0 !important;
-        }
-        .lg-copyright-checkbox label {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        .lg-copyright-checkbox input[type="checkbox"] {
-            margin-top: 3px;
-            flex-shrink: 0;
-        }
-        .lg-copyright-checkbox .required {
-            color: #b32d2e;
-            font-weight: bold;
-        }
-        </style>
-        <?php
-    }
-
-    /**
-     * Validate copyright checkbox is checked
-     */
-    public function validate_copyright_checkbox() {
-        // Only validate if cart has customized products
-        if (!$this->cart_has_designs()) {
-            return;
-        }
-
-        if (!isset($_POST['lg_copyright_agreement']) || $_POST['lg_copyright_agreement'] !== 'yes') {
-            wc_add_notice(
-                __('You must agree to the copyright terms to proceed with your custom design order.', 'loosegallery-woocommerce'),
-                'error'
-            );
-        }
     }
 
     /**

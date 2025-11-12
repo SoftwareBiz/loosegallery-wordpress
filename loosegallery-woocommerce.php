@@ -201,8 +201,7 @@ class LooseGallery_WooCommerce {
             'button_font_color' => '#ffffff',
             'tag_text' => __('Customize Me', 'loosegallery-woocommerce'),
             'tag_color' => '#ff6b6b',
-            'tag_font_color' => '#ffffff',
-            'copyright_text' => __('I agree to the copyright ownership and understand my design will be printed as is.', 'loosegallery-woocommerce')
+            'tag_font_color' => '#ffffff'
         );
 
         add_option('loosegallery_woocommerce_settings', $default_options);
