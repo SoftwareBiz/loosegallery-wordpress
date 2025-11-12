@@ -33,8 +33,8 @@ class LG_Cart {
         // Display design info in cart
         add_filter('woocommerce_get_item_data', array($this, 'display_design_in_cart'), 10, 2);
         
-        // Replace cart item thumbnail with design preview
-        add_filter('woocommerce_cart_item_thumbnail', array($this, 'replace_cart_thumbnail'), 10, 3);
+        // Replace cart item thumbnail with design preview (high priority for Blocks compatibility)
+        add_filter('woocommerce_cart_item_thumbnail', array($this, 'replace_cart_thumbnail'), 999, 3);
         
         // Add edit design button in cart
         add_action('woocommerce_after_cart_item_name', array($this, 'add_edit_button_cart'), 10, 2);
@@ -123,6 +123,9 @@ class LG_Cart {
             'api_key' => $api_key,
             'timestamp' => time()
         ));
+
+        // Also store in transient as backup (same as when starting new design)
+        set_transient('lg_product_' . $template_serial, $product_id, HOUR_IN_SECONDS);
 
         // Generate editor URL with existing design serial to edit
         $api = new LG_API($api_key);
