@@ -140,6 +140,7 @@
 .lg-cart-edit-wrapper {
     margin-top: 10px;
     display: inline-block;
+    max-width: fit-content;
 }
 
 .lg-cart-edit-button {
@@ -155,6 +156,8 @@
     cursor: pointer;
     transition: background 0.2s ease;
     white-space: nowrap;
+    width: auto !important;
+    max-width: fit-content;
 }
 
 .lg-cart-edit-button:hover {

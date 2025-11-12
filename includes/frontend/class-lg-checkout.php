@@ -36,8 +36,9 @@ class LG_Checkout {
         // Hide edit button for completed orders
         add_filter('woocommerce_order_item_meta_end', array($this, 'hide_edit_button_for_locked'), 10, 3);
         
-        // Add design preview to order emails
+        // Add design preview to order emails and checkout review
         add_filter('woocommerce_order_item_thumbnail', array($this, 'add_design_preview_to_email'), 10, 2);
+        add_filter('woocommerce_cart_item_thumbnail', array($this, 'replace_checkout_thumbnail'), 20, 3);
     }
 
     /**
@@ -292,5 +293,29 @@ class LG_Checkout {
         }
 
         return $serials;
+    }
+
+    /**
+     * Replace thumbnail in checkout review with design preview
+     */
+    public function replace_checkout_thumbnail($thumbnail, $cart_item, $cart_item_key) {
+        // Only apply on checkout page
+        if (!is_checkout()) {
+            return $thumbnail;
+        }
+
+        // Check if this item has a custom design
+        if (!isset($cart_item['lg_design_data']['preview_url'])) {
+            return $thumbnail;
+        }
+
+        $preview_url = $cart_item['lg_design_data']['preview_url'];
+        $product_name = $cart_item['data']->get_name();
+
+        return sprintf(
+            '<img src="%s" alt="%s" class="lg-checkout-preview" />',
+            esc_url($preview_url),
+            esc_attr($product_name)
+        );
     }
 }
