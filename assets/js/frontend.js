@@ -54,4 +54,24 @@
         $(this).text('Opening editor...').css('opacity', '0.6');
     });
 
+    // WooCommerce Blocks Checkout - Add design preview URLs to order summary items
+    if ($('.wp-block-woocommerce-checkout-order-summary-block').length && typeof lgDesignPreviews !== 'undefined') {
+        var updateBlocksCheckoutImages = function() {
+            setTimeout(function() {
+                $('.wc-block-components-order-summary-item').each(function(index) {
+                    var $item = $(this);
+                    var $img = $item.find('.wc-block-components-order-summary-item__image img');
+                    
+                    if ($img.length && lgDesignPreviews[index]) {
+                        $img.attr('src', lgDesignPreviews[index]);
+                    }
+                });
+            }, 100);
+        };
+        
+        updateBlocksCheckoutImages();
+        $(document.body).on('updated_checkout', updateBlocksCheckoutImages);
+        $(document.body).on('updated_cart_totals', updateBlocksCheckoutImages);
+    }
+
 })(jQuery);
