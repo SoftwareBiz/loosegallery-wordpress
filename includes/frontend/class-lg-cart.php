@@ -36,12 +36,6 @@ class LG_Cart {
         // Replace cart item thumbnail with design preview (high priority for Blocks compatibility)
         add_filter('woocommerce_cart_item_thumbnail', array($this, 'replace_cart_thumbnail'), 999, 3);
         
-        // WooCommerce Blocks uses this filter for product images
-        add_filter('woocommerce_product_get_image', array($this, 'replace_product_image_in_cart'), 999, 5);
-        
-        // WooCommerce Blocks Store API - modify cart item data for REST API
-        add_filter('woocommerce_rest_prepare_product_object', array($this, 'modify_product_images_for_blocks'), 10, 3);
-        
         // Add edit design button in cart
         add_action('woocommerce_after_cart_item_name', array($this, 'add_edit_button_cart'), 10, 2);
         
@@ -165,77 +159,6 @@ class LG_Cart {
             // Clear the design from session
             $this->session->remove_design($product_id);
         }
-    }
-
-    /**
-     * Replace product image in cart/checkout for WooCommerce Blocks
-     */
-    public function replace_product_image_in_cart($image, $product, $size, $attr, $placeholder) {
-        // Only apply on cart or checkout pages
-        if (!is_cart() && !is_checkout()) {
-            return $image;
-        }
-
-        // Check if we're in a cart context and this product has a design
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if ($cart_item['data']->get_id() === $product->get_id() && 
-                isset($cart_item['lg_design_data']['preview_url'])) {
-                
-                $preview_url = $cart_item['lg_design_data']['preview_url'];
-                $product_name = $product->get_name();
-                
-                return sprintf(
-                    '<img src="%s" alt="%s" class="lg-cart-preview" />',
-                    esc_url($preview_url),
-                    esc_attr($product_name)
-                );
-            }
-        }
-
-        return $image;
-    }
-
-    /**
-     * Modify product images for WooCommerce Blocks REST API
-     */
-    public function modify_product_images_for_blocks($response, $product, $request) {
-        // Check if this product has a design in the cart
-        if (!WC()->cart) {
-            return $response;
-        }
-
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if ($cart_item['data']->get_id() === $product->get_id() && 
-                isset($cart_item['lg_design_data']['preview_url'])) {
-                
-                $preview_url = $cart_item['lg_design_data']['preview_url'];
-                
-                // Replace all image URLs in the response with the design preview
-                $data = $response->get_data();
-                if (isset($data['images']) && is_array($data['images'])) {
-                    foreach ($data['images'] as &$image) {
-                        $image['src'] = $preview_url;
-                    }
-                    $response->set_data($data);
-                }
-                
-                break;
-            }
-        }
-
-        return $response;
-    }
-
-    /**
-     * Replace thumbnail for WooCommerce Blocks Store API
-     */
-    public function replace_blocks_thumbnail($thumbnail, $cart_item, $cart_item_key) {
-        // Check if this item has a custom design
-        if (isset($cart_item['lg_design_data']['preview_url'])) {
-            return $cart_item['lg_design_data']['preview_url'];
-        }
-        
-        return $thumbnail;
     }
 
     /**

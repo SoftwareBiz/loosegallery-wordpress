@@ -30,9 +30,6 @@ class LG_Checkout {
         
         // Add design preview to order emails
         add_filter('woocommerce_order_item_thumbnail', array($this, 'add_design_preview_to_email'), 10, 2);
-        
-        // Add design preview URLs for WooCommerce Blocks checkout
-        add_action('wp_footer', array($this, 'add_blocks_design_data'));
     }
 
     /**
@@ -216,32 +213,5 @@ class LG_Checkout {
         }
 
         return $serials;
-    }
-
-    /**
-     * Add design preview URLs for WooCommerce Blocks checkout
-     */
-    public function add_blocks_design_data() {
-        if (!is_checkout() || !WC()->cart) {
-            return;
-        }
-
-        $design_previews = array();
-        
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if (isset($cart_item['lg_design_data']['preview_url'])) {
-                $design_previews[] = $cart_item['lg_design_data']['preview_url'];
-            } else {
-                $design_previews[] = null;
-            }
-        }
-
-        if (!empty(array_filter($design_previews))) {
-            ?>
-            <script type="text/javascript">
-                var lgDesignPreviews = <?php echo json_encode($design_previews); ?>;
-            </script>
-            <?php
-        }
     }
 }
