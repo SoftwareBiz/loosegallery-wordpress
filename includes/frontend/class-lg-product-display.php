@@ -64,20 +64,10 @@ class LG_Product_Display {
             return;
         }
 
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        $tag_text = $settings['tag_text'] ?? 'Customize Me';
-        $tag_color = $settings['tag_color'] ?? '#ff6b6b';
-        $tag_font_color = $settings['tag_font_color'] ?? '#ffffff';
-        $tag_font_size = $settings['tag_font_size'] ?? 14;
-
+        $plugin_url = plugins_url('assets/images/customize.svg', dirname(dirname(__FILE__)));
+        
         ?>
-        <div class="lg-customize-tag" style="
-            background-color: <?php echo esc_attr($tag_color); ?>;
-            color: <?php echo esc_attr($tag_font_color); ?>;
-            font-size: <?php echo esc_attr($tag_font_size); ?>px;
-        ">
-            <?php echo esc_html($tag_text); ?>
-        </div>
+        <img src="<?php echo esc_url($plugin_url); ?>" alt="Customize" class="lg-customize-tag" />
         <?php
     }
 
