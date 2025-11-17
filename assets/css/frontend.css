@@ -5,7 +5,7 @@
 /* Customize Me Tag */
 .lg-customize-tag-wrapper {
     position: absolute;
-    top: 10px;
+    top: 25px;
     right: -34px;
     z-index: 10;
     pointer-events: none;
