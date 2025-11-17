@@ -63,14 +63,6 @@ class LG_Admin_Settings {
             array($this, 'render_button_section'),
             'loosegallery-settings'
         );
-
-        // Tag Customization Section
-        add_settings_section(
-            'lg_tag_section',
-            __('Tag Customization', 'loosegallery-woocommerce'),
-            array($this, 'render_tag_section'),
-            'loosegallery-settings'
-        );
     }
 
     /**
@@ -93,12 +85,6 @@ class LG_Admin_Settings {
         $sanitized['button_color'] = isset($input['button_color']) ? sanitize_hex_color($input['button_color']) : '#000000';
         $sanitized['button_font_color'] = isset($input['button_font_color']) ? sanitize_hex_color($input['button_font_color']) : '#ffffff';
         $sanitized['button_font_size'] = isset($input['button_font_size']) ? absint($input['button_font_size']) : 16;
-
-        // Sanitize tag settings
-        $sanitized['tag_text'] = isset($input['tag_text']) ? sanitize_text_field($input['tag_text']) : 'Customize Me';
-        $sanitized['tag_color'] = isset($input['tag_color']) ? sanitize_hex_color($input['tag_color']) : '#ff6b6b';
-        $sanitized['tag_font_color'] = isset($input['tag_font_color']) ? sanitize_hex_color($input['tag_font_color']) : '#ffffff';
-        $sanitized['tag_font_size'] = isset($input['tag_font_size']) ? absint($input['tag_font_size']) : 14;
 
         return $sanitized;
     }
@@ -365,70 +351,6 @@ class LG_Admin_Settings {
         <?php
     }
 
-    /**
-     * Render tag customization section
-     */
-    public function render_tag_section() {
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        ?>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="lg_tag_text"><?php _e('Tag Text', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="text" 
-                           id="lg_tag_text" 
-                           name="loosegallery_woocommerce_settings[tag_text]" 
-                           value="<?php echo esc_attr($settings['tag_text'] ?? 'Customize Me'); ?>" 
-                           class="regular-text" />
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="lg_tag_color"><?php _e('Tag Background Color', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="text" 
-                           id="lg_tag_color" 
-                           name="loosegallery_woocommerce_settings[tag_color]" 
-                           value="<?php echo esc_attr($settings['tag_color'] ?? '#ff6b6b'); ?>" 
-                           class="lg-color-picker" />
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="lg_tag_font_color"><?php _e('Tag Text Color', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="text" 
-                           id="lg_tag_font_color" 
-                           name="loosegallery_woocommerce_settings[tag_font_color]" 
-                           value="<?php echo esc_attr($settings['tag_font_color'] ?? '#ffffff'); ?>" 
-                           class="lg-color-picker" />
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="lg_tag_font_size"><?php _e('Tag Font Size (px)', 'loosegallery-woocommerce'); ?></label>
-                </th>
-                <td>
-                    <input type="number" 
-                           id="lg_tag_font_size" 
-                           name="loosegallery_woocommerce_settings[tag_font_size]" 
-                           value="<?php echo esc_attr($settings['tag_font_size'] ?? 14); ?>" 
-                           min="10" 
-                           max="24" 
-                           class="small-text" />
-                </td>
-            </tr>
-        </table>
-        <?php
-    }
-
-    /**
-     * Render copyright section
-     */
     /**
      * AJAX: Test API connection
      */
