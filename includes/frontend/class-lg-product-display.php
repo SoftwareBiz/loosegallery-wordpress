@@ -67,7 +67,9 @@ class LG_Product_Display {
         $plugin_url = plugins_url('assets/images/customize.svg', dirname(dirname(__FILE__)));
         
         ?>
-        <img src="<?php echo esc_url($plugin_url); ?>" alt="Customize" class="lg-customize-tag" />
+        <div class="lg-customize-tag-wrapper">
+            <img src="<?php echo esc_url($plugin_url); ?>" alt="Customize" class="lg-customize-tag" />
+        </div>
         <?php
     }
 

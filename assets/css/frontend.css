@@ -3,14 +3,19 @@
  */
 
 /* Customize Me Tag */
-.lg-customize-tag {
+.lg-customize-tag-wrapper {
     position: absolute;
     top: 0;
-    right: 0;
-    width: auto;
-    height: 163px;
+    right: -34px;
     z-index: 10;
     pointer-events: none;
+}
+
+.lg-customize-tag {
+    display: block;
+    width: auto;
+    height: 163px;
+    border-radius: 0 !important;
 }
 
 .lg-customize-tag-single {
@@ -175,6 +180,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .lg-customize-tag-wrapper {
+        right: -25px;
+    }
+    
     .lg-customize-tag {
         height: 120px;
     }
