@@ -47,6 +47,9 @@ class LG_Cart {
         
         // Save design data to order
         add_action('woocommerce_checkout_create_order_line_item', array($this, 'save_design_to_order'), 10, 4);
+        
+        // Format order item meta display names
+        add_filter('woocommerce_order_item_display_meta_key', array($this, 'format_meta_key_display'), 10, 3);
     }
 
     /**
@@ -205,23 +208,15 @@ class LG_Cart {
      */
     public function save_design_to_order($item, $cart_item_key, $values, $order) {
         if (isset($values['lg_design_serial'])) {
-            $item->add_meta_data('Design Serial', $values['lg_design_serial'], true);
-            $item->add_meta_data('Design Locked', 'no', true);
+            $item->add_meta_data('_lg_design_serial', $values['lg_design_serial'], true);
+            $item->add_meta_data('_lg_design_locked', 'no', true);
             
             // Save preview URL for order display
             if (isset($values['lg_design_data']['preview_url'])) {
-                $item->add_meta_data('Design Preview', $values['lg_design_data']['preview_url'], true);
+                $item->add_meta_data('_lg_design_preview_url', $values['lg_design_data']['preview_url'], true);
             }
             
             // Save timestamp
-            $item->add_meta_data('Design Ordered At', current_time('mysql'), true);
-            
-            // Also save with underscored keys for internal use
-            $item->add_meta_data('_lg_design_serial', $values['lg_design_serial'], true);
-            $item->add_meta_data('_lg_design_locked', 'no', true);
-            if (isset($values['lg_design_data']['preview_url'])) {
-                $item->add_meta_data('_lg_design_preview_url', $values['lg_design_data']['preview_url'], true);
-            }
             $item->add_meta_data('_lg_design_ordered_at', current_time('mysql'), true);
         }
     }

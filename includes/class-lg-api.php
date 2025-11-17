@@ -126,7 +126,7 @@ class LG_API {
                 getProduct(productSerial: $productSerial) {
                     title
                     description
-                    imageUrl(permanent: true)
+                    imageUrl
                 }
             }
         ';
