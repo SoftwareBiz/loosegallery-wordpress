@@ -50,6 +50,9 @@ class LG_Cart {
         
         // Format order item meta display names
         add_filter('woocommerce_order_item_display_meta_key', array($this, 'format_meta_key_display'), 10, 3);
+        
+        // Format order item meta display values
+        add_filter('woocommerce_order_item_display_meta_value', array($this, 'format_meta_value_display'), 10, 3);
     }
 
     /**
@@ -219,6 +222,55 @@ class LG_Cart {
             // Save timestamp
             $item->add_meta_data('_lg_design_ordered_at', current_time('mysql'), true);
         }
+    }
+
+    /**
+     * Format order item meta key display names
+     */
+    public function format_meta_key_display($display_key, $meta, $item) {
+        // Check if meta has the key property
+        if (!is_object($meta) || !isset($meta->key)) {
+            return $display_key;
+        }
+        
+        $key_mapping = array(
+            '_lg_design_serial' => 'Design Serial',
+            '_lg_design_locked' => 'Design Locked',
+            '_lg_design_preview_url' => 'Design Preview',
+            '_lg_design_ordered_at' => 'Design Ordered At',
+            '_lg_design_locked_at' => 'Design Locked At'
+        );
+        
+        if (isset($key_mapping[$meta->key])) {
+            return $key_mapping[$meta->key];
+        }
+        
+        return $display_key;
+    }
+
+    /**
+     * Format order item meta value display
+     */
+    public function format_meta_value_display($display_value, $meta, $item) {
+        // Check if meta has the required properties
+        if (!is_object($meta) || !isset($meta->key) || !isset($meta->value)) {
+            return $display_value;
+        }
+        
+        // Format preview URL as a clickable link
+        if ($meta->key === '_lg_design_preview_url' && !empty($meta->value)) {
+            return sprintf(
+                '<a href="%s" target="_blank">View Design Preview</a>',
+                esc_url($meta->value)
+            );
+        }
+        
+        // Format locked status as Yes/No
+        if ($meta->key === '_lg_design_locked') {
+            return $meta->value === 'yes' ? 'Yes' : 'No';
+        }
+        
+        return $display_value;
     }
 
     /**
