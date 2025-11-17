@@ -205,15 +205,23 @@ class LG_Cart {
      */
     public function save_design_to_order($item, $cart_item_key, $values, $order) {
         if (isset($values['lg_design_serial'])) {
-            $item->add_meta_data('_lg_design_serial', $values['lg_design_serial'], true);
-            $item->add_meta_data('_lg_design_locked', 'no', true);
+            $item->add_meta_data('Design Serial', $values['lg_design_serial'], true);
+            $item->add_meta_data('Design Locked', 'no', true);
             
             // Save preview URL for order display
             if (isset($values['lg_design_data']['preview_url'])) {
-                $item->add_meta_data('_lg_design_preview_url', $values['lg_design_data']['preview_url'], true);
+                $item->add_meta_data('Design Preview', $values['lg_design_data']['preview_url'], true);
             }
             
             // Save timestamp
+            $item->add_meta_data('Design Ordered At', current_time('mysql'), true);
+            
+            // Also save with underscored keys for internal use
+            $item->add_meta_data('_lg_design_serial', $values['lg_design_serial'], true);
+            $item->add_meta_data('_lg_design_locked', 'no', true);
+            if (isset($values['lg_design_data']['preview_url'])) {
+                $item->add_meta_data('_lg_design_preview_url', $values['lg_design_data']['preview_url'], true);
+            }
             $item->add_meta_data('_lg_design_ordered_at', current_time('mysql'), true);
         }
     }

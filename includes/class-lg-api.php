@@ -126,7 +126,7 @@ class LG_API {
                 getProduct(productSerial: $productSerial) {
                     title
                     description
-                    imageUrl
+                    imageUrl(permanent: true)
                 }
             }
         ';
@@ -141,6 +141,7 @@ class LG_API {
             return array(
                 'success' => true,
                 'preview_url' => $response['data']['getProduct']['imageUrl'] ?? '',
+                'thumbnail_url' => $response['data']['getProduct']['imageUrl'] ?? '',
                 'title' => $response['data']['getProduct']['title'] ?? '',
                 'description' => $response['data']['getProduct']['description'] ?? ''
             );

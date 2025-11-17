@@ -66,6 +66,17 @@ class LG_Checkout {
         }
 
         $this->lock_order_designs($order);
+        
+        // Clear design sessions for ordered products
+        if (class_exists('LG_Session')) {
+            $session = new LG_Session();
+            foreach ($order->get_items() as $item) {
+                $product_id = $item->get_product_id();
+                if ($item->get_meta('_lg_design_serial')) {
+                    $session->remove_design($product_id);
+                }
+            }
+        }
     }
 
     /**
@@ -113,6 +124,8 @@ class LG_Checkout {
                 // Mark as locked in order meta
                 $item->update_meta_data('_lg_design_locked', 'yes');
                 $item->update_meta_data('_lg_design_locked_at', current_time('mysql'));
+                $item->update_meta_data('Design Locked', 'yes');
+                $item->update_meta_data('Design Locked At', current_time('mysql'));
                 $item->save();
 
                 // Log the action
