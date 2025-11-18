@@ -48,11 +48,8 @@ class LG_Cart {
         // Save design data to order
         add_action('woocommerce_checkout_create_order_line_item', array($this, 'save_design_to_order'), 10, 4);
         
-        // Format order item meta display names
-        add_filter('woocommerce_order_item_display_meta_key', array($this, 'format_meta_key_display'), 10, 3);
-        
-        // Format order item meta display values
-        add_filter('woocommerce_order_item_display_meta_value', array($this, 'format_meta_value_display'), 10, 3);
+        // Hide internal meta fields from order display
+        add_filter('woocommerce_hidden_order_itemmeta', array($this, 'hide_internal_meta_fields'), 10, 1);
     }
 
     /**
@@ -211,66 +208,40 @@ class LG_Cart {
      */
     public function save_design_to_order($item, $cart_item_key, $values, $order) {
         if (isset($values['lg_design_serial'])) {
+            // Save internal meta fields (hidden from display)
             $item->add_meta_data('_lg_design_serial', $values['lg_design_serial'], true);
             $item->add_meta_data('_lg_design_locked', 'no', true);
+            $item->add_meta_data('_lg_design_ordered_at', current_time('mysql'), true);
             
-            // Save preview URL for order display
             if (isset($values['lg_design_data']['preview_url'])) {
                 $item->add_meta_data('_lg_design_preview_url', $values['lg_design_data']['preview_url'], true);
             }
             
-            // Save timestamp
-            $item->add_meta_data('_lg_design_ordered_at', current_time('mysql'), true);
+            // Save display meta fields (visible to customers)
+            $item->add_meta_data('Design Serial', $values['lg_design_serial'], true);
+            $item->add_meta_data('Design Status', 'Pending', true);
+            
+            if (isset($values['lg_design_data']['preview_url'])) {
+                $preview_link = sprintf(
+                    '<a href="%s" target="_blank">View Design</a>',
+                    esc_url($values['lg_design_data']['preview_url'])
+                );
+                $item->add_meta_data('Design Preview', $preview_link, true);
+            }
         }
     }
 
     /**
-     * Format order item meta key display names
+     * Hide internal meta fields from order display
      */
-    public function format_meta_key_display($display_key, $meta, $item) {
-        // Check if meta has the key property
-        if (!is_object($meta) || !isset($meta->key)) {
-            return $display_key;
-        }
+    public function hide_internal_meta_fields($hidden_fields) {
+        $hidden_fields[] = '_lg_design_serial';
+        $hidden_fields[] = '_lg_design_locked';
+        $hidden_fields[] = '_lg_design_preview_url';
+        $hidden_fields[] = '_lg_design_ordered_at';
+        $hidden_fields[] = '_lg_design_locked_at';
         
-        $key_mapping = array(
-            '_lg_design_serial' => 'Design Serial',
-            '_lg_design_locked' => 'Design Locked',
-            '_lg_design_preview_url' => 'Design Preview',
-            '_lg_design_ordered_at' => 'Design Ordered At',
-            '_lg_design_locked_at' => 'Design Locked At'
-        );
-        
-        if (isset($key_mapping[$meta->key])) {
-            return $key_mapping[$meta->key];
-        }
-        
-        return $display_key;
-    }
-
-    /**
-     * Format order item meta value display
-     */
-    public function format_meta_value_display($display_value, $meta, $item) {
-        // Check if meta has the required properties
-        if (!is_object($meta) || !isset($meta->key) || !isset($meta->value)) {
-            return $display_value;
-        }
-        
-        // Format preview URL as a clickable link
-        if ($meta->key === '_lg_design_preview_url' && !empty($meta->value)) {
-            return sprintf(
-                '<a href="%s" target="_blank">View Design Preview</a>',
-                esc_url($meta->value)
-            );
-        }
-        
-        // Format locked status as Yes/No
-        if ($meta->key === '_lg_design_locked') {
-            return $meta->value === 'yes' ? 'Yes' : 'No';
-        }
-        
-        return $display_value;
+        return $hidden_fields;
     }
 
     /**

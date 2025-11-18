@@ -66,6 +66,26 @@ class LG_Checkout {
         }
 
         $this->lock_order_designs($order);
+        
+        // Clear design sessions for ordered products
+        if (class_exists('LG_Session')) {
+            $session = new LG_Session();
+            foreach ($order->get_items() as $item) {
+                $product_id = $item->get_product_id();
+                if ($item->get_meta('_lg_design_serial')) {
+                    $session->remove_design($product_id);
+                    
+                    // Also clear transient
+                    $template_serial = get_post_meta($product_id, '_lg_template_serial', true);
+                    if ($template_serial) {
+                        delete_transient('lg_product_' . $template_serial);
+                    }
+                }
+            }
+            
+            // Clear pending product from session
+            WC()->session->set('lg_pending_product', null);
+        }
     }
 
     /**
@@ -110,9 +130,12 @@ class LG_Checkout {
             $result = $api->lock_design($design_serial);
 
             if ($result['success']) {
-                // Mark as locked in order meta
+                // Mark as locked in order meta (internal fields)
                 $item->update_meta_data('_lg_design_locked', 'yes');
                 $item->update_meta_data('_lg_design_locked_at', current_time('mysql'));
+                
+                // Update display field
+                $item->update_meta_data('Design Status', 'Locked');
                 $item->save();
 
                 // Log the action
