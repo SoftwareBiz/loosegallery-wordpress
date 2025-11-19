@@ -67,31 +67,23 @@ class LG_API {
 
         $response = $this->make_graphql_request($query, $variables);
 
-        // Debug logging
-        error_log('Loose Gallery test_connection - Full Response: ' . print_r($response, true));
-
-        if ($response['success'] && isset($response['data']['getAssets']['items'][0])) {
-            $item_json = $response['data']['getAssets']['items'][0];
+        if ($response['success'] && isset($response['data']['getAssets']['items'])) {
+            // The items field is a JSON string, need to decode it
+            $items_json = $response['data']['getAssets']['items'];
+            $items_array = json_decode($items_json, true);
             
-            // Debug the raw item
-            error_log('Loose Gallery test_connection - Raw Item JSON: ' . $item_json);
-            
-            $domain_data = json_decode($item_json, true);
-            
-            // Debug the decoded data
-            error_log('Loose Gallery test_connection - Decoded Domain Data: ' . print_r($domain_data, true));
-            
-            $domain_name = isset($domain_data['domain_name']) ? $domain_data['domain_name'] : '';
-            
-            error_log('Loose Gallery test_connection - Domain Name: ' . $domain_name);
-            error_log('Loose Gallery test_connection - Domain ID: ' . $domain_id);
-            
-            return array(
-                'success' => true,
-                'message' => __('API connection successful', 'loosegallery-woocommerce'),
-                'domain_name' => $domain_name,
-                'domain_id' => $domain_id
-            );
+            if ($items_array && is_array($items_array) && count($items_array) > 0) {
+                $domain_data = $items_array[0];
+                
+                $domain_name = isset($domain_data['domain_name']) ? $domain_data['domain_name'] : '';
+                
+                return array(
+                    'success' => true,
+                    'message' => __('API connection successful', 'loosegallery-woocommerce'),
+                    'domain_name' => $domain_name,
+                    'domain_id' => $domain_id
+                );
+            }
         }
 
         return array(
