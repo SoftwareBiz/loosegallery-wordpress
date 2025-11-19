@@ -185,6 +185,7 @@ class LG_Admin_Settings {
                 var $input = $row.find('.lg-api-key-input');
                 var $status = $row.find('.lg-api-status');
                 var $domainName = $row.find('.lg-domain-name');
+                var $hiddenInput = $row.find('input[type="hidden"][name*="domain_names"]');
                 var apiKey = $input.val();
 
                 if (!apiKey) {
@@ -208,13 +209,8 @@ class LG_Admin_Settings {
                             $status.html('<span style="color: #46b450;">✓ <?php _e('Connected', 'loosegallery-woocommerce'); ?></span>');
                             if (response.data.domain_name) {
                                 $domainName.text('<?php _e('Domain:', 'loosegallery-woocommerce'); ?> ' + response.data.domain_name + ' (ID: ' + response.data.domain_id + ')');
-                                // Save domain name in hidden field
-                                var $hiddenInput = $input.siblings('input[name="loosegallery_woocommerce_settings[domain_names][' + index + ']"]');
-                                if ($hiddenInput.length === 0) {
-                                    $input.after('<input type="hidden" name="loosegallery_woocommerce_settings[domain_names][' + index + ']" value="' + response.data.domain_name + '" />');
-                                } else {
-                                    $hiddenInput.val(response.data.domain_name);
-                                }
+                                // Update hidden field with domain name
+                                $hiddenInput.val(response.data.domain_name);
                             }
                         } else {
                             var errorMsg = response.data.message || '<?php _e('Connection failed', 'loosegallery-woocommerce'); ?>';
