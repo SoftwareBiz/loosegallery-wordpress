@@ -140,21 +140,32 @@ class LG_Admin_Settings {
 
         <script type="text/javascript">
         jQuery(document).ready(function($) {
-            var apiKeyIndex = <?php echo count($api_keys); ?>;
+            // Function to renumber all API key rows
+            function renumberApiKeys() {
+                $('#lg-api-keys-container .lg-api-key-row').each(function(index) {
+                    $(this).find('th label').text('<?php _e('API Key', 'loosegallery-woocommerce'); ?> ' + (index + 1));
+                    $(this).find('.lg-api-key-input').attr('name', 'loosegallery_woocommerce_settings[api_keys][' + index + ']');
+                    $(this).find('input[type="hidden"]').attr('name', 'loosegallery_woocommerce_settings[domain_names][' + index + ']');
+                });
+            }
             
             // Add new API key row
             $('#lg-add-api-key').on('click', function() {
+                var nextIndex = $('#lg-api-keys-container .lg-api-key-row').length;
                 var newRow = `
                     <tr class="lg-api-key-row">
                         <th scope="row">
-                            <label><?php _e('API Key', 'loosegallery-woocommerce'); ?> ${apiKeyIndex + 1}</label>
+                            <label><?php _e('API Key', 'loosegallery-woocommerce'); ?> ${nextIndex + 1}</label>
                         </th>
                         <td>
                             <input type="password" 
-                                   name="loosegallery_woocommerce_settings[api_keys][${apiKeyIndex}]" 
+                                   name="loosegallery_woocommerce_settings[api_keys][${nextIndex}]" 
                                    class="regular-text lg-api-key-input" 
                                    placeholder="<?php _e('Enter API key...', 'loosegallery-woocommerce'); ?>" />
-                            <button type="button" class="button lg-test-api-key" data-index="${apiKeyIndex}">
+                            <input type="hidden" 
+                                   name="loosegallery_woocommerce_settings[domain_names][${nextIndex}]" 
+                                   value="" />
+                            <button type="button" class="button lg-test-api-key" data-index="${nextIndex}">
                                 <?php _e('Test Connection', 'loosegallery-woocommerce'); ?>
                             </button>
                             <button type="button" class="button lg-remove-api-key">
@@ -166,13 +177,13 @@ class LG_Admin_Settings {
                     </tr>
                 `;
                 $('#lg-api-keys-container').append(newRow);
-                apiKeyIndex++;
             });
 
             // Remove API key row
             $(document).on('click', '.lg-remove-api-key', function() {
                 if ($('.lg-api-key-row').length > 1) {
                     $(this).closest('tr').remove();
+                    renumberApiKeys();
                 } else {
                     alert('<?php _e('You must have at least one API key field.', 'loosegallery-woocommerce'); ?>');
                 }
@@ -205,12 +216,22 @@ class LG_Admin_Settings {
                         nonce: '<?php echo wp_create_nonce('lg-test-api'); ?>'
                     },
                     success: function(response) {
+                        console.log('API Test Response:', response);
                         if (response.success) {
                             $status.html('<span style="color: #46b450;">✓ <?php _e('Connected', 'loosegallery-woocommerce'); ?></span>');
                             if (response.data.domain_name) {
+                                console.log('Domain name received:', response.data.domain_name);
+                                console.log('Hidden input found:', $hiddenInput.length);
                                 $domainName.text('<?php _e('Domain:', 'loosegallery-woocommerce'); ?> ' + response.data.domain_name + ' (ID: ' + response.data.domain_id + ')');
                                 // Update hidden field with domain name
-                                $hiddenInput.val(response.data.domain_name);
+                                if ($hiddenInput.length > 0) {
+                                    $hiddenInput.val(response.data.domain_name);
+                                    console.log('Hidden input value set to:', $hiddenInput.val());
+                                } else {
+                                    console.error('Hidden input field not found!');
+                                }
+                            } else {
+                                console.log('No domain_name in response');
                             }
                         } else {
                             var errorMsg = response.data.message || '<?php _e('Connection failed', 'loosegallery-woocommerce'); ?>';
