@@ -55,14 +55,7 @@ class LG_Admin_Settings {
         );
 
         // URL Settings Section removed - editor URL and return URL are configured in the editor
-
-        // Button Customization Section
-        add_settings_section(
-            'lg_button_section',
-            __('Button Customization', 'loosegallery-woocommerce'),
-            array($this, 'render_button_section'),
-            'loosegallery-settings'
-        );
+        // Button Customization Section removed - button now uses SVG image
     }
 
     /**
@@ -79,12 +72,7 @@ class LG_Admin_Settings {
         }
 
         // Editor URL and return URL are hardcoded - no need to save them
-
-        // Sanitize button settings
-        $sanitized['button_text'] = isset($input['button_text']) ? sanitize_text_field($input['button_text']) : 'Start Design';
-        $sanitized['button_color'] = isset($input['button_color']) ? sanitize_hex_color($input['button_color']) : '#000000';
-        $sanitized['button_font_color'] = isset($input['button_font_color']) ? sanitize_hex_color($input['button_font_color']) : '#ffffff';
-        $sanitized['button_font_size'] = isset($input['button_font_size']) ? absint($input['button_font_size']) : 16;
+        // Button customization removed - button now uses SVG image
 
         return $sanitized;
     }

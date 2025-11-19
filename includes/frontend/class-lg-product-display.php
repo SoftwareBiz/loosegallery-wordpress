@@ -120,14 +120,6 @@ class LG_Product_Display {
         if ($has_design) {
             return;
         }
-        
-        $settings = get_option('loosegallery_woocommerce_settings', array());
-        
-        // Get button settings
-        $button_text = $settings['button_text'] ?? 'LET ME LOOSE!';
-        $button_color = $settings['button_color'] ?? '#000000';
-        $button_font_color = $settings['button_font_color'] ?? '#ffffff';
-        $button_font_size = $settings['button_font_size'] ?? 16;
 
         // Get product customization data
         $domain_id = get_post_meta($product_id, '_lg_domain_id', true);
@@ -153,16 +145,11 @@ class LG_Product_Display {
         $api = new LG_API($api_key);
         $editor_url = $api->get_editor_url($domain_id, $template_serial);
 
+        $svg_url = LG_WC_PLUGIN_URL . 'assets/images/letmeloose.svg';
         ?>
         <div class="lg-design-button-wrapper">
-            <a href="<?php echo esc_url($editor_url); ?>" 
-               class="button lg-design-button" 
-               style="
-                   background-color: <?php echo esc_attr($button_color); ?>;
-                   color: <?php echo esc_attr($button_font_color); ?>;
-                   font-size: <?php echo esc_attr($button_font_size); ?>px;
-               ">
-                <?php echo esc_html($button_text); ?>
+            <a href="<?php echo esc_url($editor_url); ?>" class="lg-design-button">
+                <img src="<?php echo esc_url($svg_url); ?>" alt="Let Me Loose" class="lg-design-button-image" />
             </a>
         </div>
         <?php

@@ -196,12 +196,9 @@ class LooseGallery_WooCommerce {
             'api_keys' => array(),
             'return_url' => home_url(),
             'editor_base_url' => 'https://editor.loosegallery.com',
-            'button_text' => __('Start Design', 'loosegallery-woocommerce'),
-            'button_color' => '#000000',
-            'button_font_color' => '#ffffff',
             'tag_text' => __('Customize Me', 'loosegallery-woocommerce'),
             'tag_color' => '#ff6b6b',
-            'tag_font_color' => '#ffffff'
+            'tag_font_color' => '#ffffff'\n        );\n\n        add_option('loosegallery_woocommerce_settings', $default_options);
         );
 
         add_option('loosegallery_woocommerce_settings', $default_options);
