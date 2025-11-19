@@ -198,7 +198,7 @@ class LooseGallery_WooCommerce {
             'editor_base_url' => 'https://editor.loosegallery.com',
             'tag_text' => __('Customize Me', 'loosegallery-woocommerce'),
             'tag_color' => '#ff6b6b',
-            'tag_font_color' => '#ffffff'\n        );\n\n        add_option('loosegallery_woocommerce_settings', $default_options);
+            'tag_font_color' => '#ffffff'
         );
 
         add_option('loosegallery_woocommerce_settings', $default_options);
