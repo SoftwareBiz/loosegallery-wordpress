@@ -62,15 +62,17 @@ class LG_API {
 
         $variables = array(
             'assetPks' => array('DOM#' . $domain_id),
-            'fieldOptions' => json_encode(array(
-                'domain_name' => (object)array()
-            ))
+            'fieldOptions' => '{"domain_name":{}}'
         );
 
         $response = $this->make_graphql_request($query, $variables);
 
         if ($response['success'] && isset($response['data']['getAssets']['items'][0])) {
             $domain_data = json_decode($response['data']['getAssets']['items'][0], true);
+            
+            // Debug logging
+            error_log('Loose Gallery API - Domain Data: ' . print_r($domain_data, true));
+            
             return array(
                 'success' => true,
                 'message' => __('API connection successful', 'loosegallery-woocommerce'),
