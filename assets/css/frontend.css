@@ -30,22 +30,24 @@
     margin: 20px 0;
 }
 
-.lg-design-button {
-    display: inline-block;
+.lg-design-link {
+    display: inline-block !important;
     text-decoration: none !important;
     border: none !important;
     background: none !important;
     padding: 0 !important;
+    margin: 0 !important;
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
-    line-height: 0;
+    line-height: 0 !important;
     box-shadow: none !important;
+    font-size: 0 !important;
 }
 
-.lg-design-button:hover,
-.lg-design-button:focus,
-.lg-design-button:active,
-.lg-design-button:visited {
+.lg-design-link:hover,
+.lg-design-link:focus,
+.lg-design-link:active,
+.lg-design-link:visited {
     transform: scale(1.05);
     opacity: 0.9;
     background: none !important;
@@ -56,10 +58,12 @@
 }
 
 .lg-design-button-image {
-    display: block;
+    display: block !important;
     max-width: 300px;
     height: auto;
-    border: none;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .lg-design-status {
