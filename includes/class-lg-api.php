@@ -343,7 +343,7 @@ class LG_API {
         // Editor URL with correct path
         $editor_base_url = 'https://editor.loosegallery.com/editor/';
 
-        // Use correct parameter names for LooseGallery editor
+        // Use correct parameter names for Loose Gallery editor
         // 'dom' = domain ID, 'p' = product serial (template)
         // 'productId' = WooCommerce product ID (editor will return this back to us)
         $params = array_merge(array(
@@ -386,7 +386,7 @@ class LG_API {
 
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('LooseGallery API Request: ' . print_r(array(
+            error_log('Loose Gallery API Request: ' . print_r(array(
                 'url' => $url,
                 'query' => $query,
                 'variables' => $variables,
@@ -402,7 +402,7 @@ class LG_API {
 
         // Debug response
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('LooseGallery API Response RAW: ' . print_r(array(
+            error_log('Loose Gallery API Response RAW: ' . print_r(array(
                 'status' => wp_remote_retrieve_response_code($response),
                 'headers' => wp_remote_retrieve_headers($response),
                 'body' => wp_remote_retrieve_body($response)
@@ -427,7 +427,7 @@ class LG_API {
 
         // Log for debugging (only in development)
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('LooseGallery API Response: ' . print_r(array(
+            error_log('Loose Gallery API Response: ' . print_r(array(
                 'status' => $status_code,
                 'body' => $response_body,
                 'decoded' => $decoded_body

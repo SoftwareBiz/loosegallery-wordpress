@@ -4,7 +4,7 @@
  * 
  * Adds customization settings to WooCommerce product edit page:
  * - Enable/disable customization
- * - Select LooseGallery domain
+ * - Select Loose Gallery domain
  * - Set template serial number
  */
 
@@ -35,7 +35,7 @@ class LG_Product_Meta {
     public function add_meta_box() {
         add_meta_box(
             'loosegallery_product_customization',
-            __('LooseGallery Customization', 'loosegallery-woocommerce'),
+            __('Loose Gallery Customization', 'loosegallery-woocommerce'),
             array($this, 'render_meta_box'),
             'product',
             'side',
@@ -69,7 +69,7 @@ class LG_Product_Meta {
                            name="lg_is_customizable" 
                            value="yes" 
                            <?php checked($is_customizable, 'yes'); ?> />
-                    <?php _e('Enable LooseGallery Customization', 'loosegallery-woocommerce'); ?>
+                    <?php _e('Enable Loose Gallery Customization', 'loosegallery-woocommerce'); ?>
                 </label>
             </p>
 
@@ -102,14 +102,14 @@ class LG_Product_Meta {
                         } else {
                             ?>
                             <option value="" disabled>
-                                <?php _e('No API keys configured. Please add API keys in LooseGallery settings.', 'loosegallery-woocommerce'); ?>
+                                <?php _e('No API keys configured. Please add API keys in Loose Gallery settings.', 'loosegallery-woocommerce'); ?>
                             </option>
                             <?php
                         }
                         ?>
                     </select>
                     <span class="description">
-                        <?php _e('Select which LooseGallery domain to use for this product.', 'loosegallery-woocommerce'); ?>
+                        <?php _e('Select which Loose Gallery domain to use for this product.', 'loosegallery-woocommerce'); ?>
                     </span>
                 </p>
 
@@ -124,7 +124,7 @@ class LG_Product_Meta {
                            class="widefat" 
                            placeholder="<?php _e('e.g., TEMP-12345', 'loosegallery-woocommerce'); ?>" />
                     <span class="description">
-                        <?php _e('Enter the template serial number from LooseGallery.', 'loosegallery-woocommerce'); ?>
+                        <?php _e('Enter the template serial number from Loose Gallery.', 'loosegallery-woocommerce'); ?>
                     </span>
                 </p>
 
@@ -175,7 +175,7 @@ class LG_Product_Meta {
         } catch (Exception $e) {
             echo '<div class="error"><p>Error: ' . esc_html($e->getMessage()) . '</p>';
             echo '<pre>' . esc_html($e->getTraceAsString()) . '</pre></div>';
-            error_log('LooseGallery Product Meta Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            error_log('Loose Gallery Product Meta Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
 

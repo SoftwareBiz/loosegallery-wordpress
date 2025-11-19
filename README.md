@@ -1,11 +1,11 @@
-# LooseGallery for WooCommerce
+# Loose Gallery for WooCommerce
 
-A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery design editor with your online store, allowing customers to customize products and complete purchases seamlessly.
+A comprehensive WordPress/WooCommerce plugin that integrates the Loose Gallery design editor with your online store, allowing customers to customize products and complete purchases seamlessly.
 
 ## Features
 
 ### Admin Features
-- **Multiple Domain Support**: Connect multiple LooseGallery accounts via API keys
+- **Multiple Domain Support**: Connect multiple Loose Gallery accounts via API keys
 - **Product Customization Settings**: Enable customization per product with template selection
 - **Flexible Styling**: Customize button text, colors, and tag appearance
 - **Domain Management**: View and test API connections with domain name display
@@ -13,7 +13,7 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 
 ### Customer Features
 - **Visual Customization Tags**: "Customize Me" badges on customizable products
-- **Design Editor Integration**: Seamless redirect to LooseGallery editor
+- **Design Editor Integration**: Seamless redirect to Loose Gallery editor
 - **Design Persistence**: Designs saved across sessions and user accounts
 - **Live Previews**: See custom designs in cart and checkout
 - **Edit Capability**: Modify designs before finalizing order
@@ -29,7 +29,7 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 - WordPress 5.8 or higher
 - WooCommerce 5.0 or higher
 - PHP 7.4 or higher
-- LooseGallery account(s) with API access
+- Loose Gallery account(s) with API access
 
 ## Installation
 
@@ -39,19 +39,19 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 
 2. **Activate Plugin**
    - Navigate to Plugins in WordPress admin
-   - Find "LooseGallery for WooCommerce"
+   - Find "Loose Gallery for WooCommerce"
    - Click "Activate"
 
 3. **Configure Settings**
-   - Go to LooseGallery → Settings in admin menu
+   - Go to Loose Gallery → Settings in admin menu
    - Add your API keys
    - Test connections to verify
    - Configure URLs and styling options
 
 4. **Set Up Products**
    - Edit any WooCommerce product
-   - Find "LooseGallery Customization" meta box (sidebar)
-   - Check "Enable LooseGallery Customization"
+   - Find "Loose Gallery Customization" meta box (sidebar)
+   - Check "Enable Loose Gallery Customization"
    - Select domain and enter template serial number
    - Save product
 
@@ -60,14 +60,14 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 ### API Configuration
 
 1. **Add API Keys**
-   - Navigate to LooseGallery → Settings
-   - Enter your LooseGallery API key(s)
+   - Navigate to Loose Gallery → Settings
+   - Enter your Loose Gallery API key(s)
    - Click "Test Connection" to verify
    - Domain name will display if successful
 
 2. **URL Settings**
    - **Return URL**: Where customers return after editing (default: home page)
-   - **Editor Base URL**: LooseGallery editor URL (default: https://editor.loosegallery.com)
+   - **Editor Base URL**: Loose Gallery editor URL (default: https://editor.loosegallery.com)
 
 ### Customization Options
 
@@ -91,14 +91,14 @@ A comprehensive WordPress/WooCommerce plugin that integrates the LooseGallery de
 For each customizable product:
 
 1. **Enable Customization**
-   - Check "Enable LooseGallery Customization" in product meta box
+   - Check "Enable Loose Gallery Customization" in product meta box
 
 2. **Select Domain**
-   - Choose which LooseGallery account/domain to use
+   - Choose which Loose Gallery account/domain to use
    - Only configured API keys appear in dropdown
 
 3. **Template Serial**
-   - Enter the template serial number from LooseGallery
+   - Enter the template serial number from Loose Gallery
    - This determines which template customers start with
 
 4. **Test Link** (optional)
@@ -113,7 +113,7 @@ For each customizable product:
    - "Start Design" button appears on product page
 
 2. **Design Creation**
-   - Click button to open LooseGallery editor
+   - Click button to open Loose Gallery editor
    - Create/edit design in editor
    - Return to product page with design saved
 
@@ -150,7 +150,7 @@ Product Page → Editor (external) → Return URL → Product Page
 
 ## API Integration
 
-The plugin communicates with LooseGallery GraphQL API at `https://api.loosegallery.com/graphql` for:
+The plugin communicates with Loose Gallery GraphQL API at `https://api.loosegallery.com/graphql` for:
 
 - **Domain Info**: Retrieve domain name and details
 - **Design Preview**: Get preview and thumbnail images
@@ -280,7 +280,7 @@ Currently, no shortcodes are implemented. All functionality is automatic based o
 For issues or questions:
 1. Check this documentation
 2. Review WordPress debug logs
-3. Contact LooseGallery support with plugin version and error details
+3. Contact Loose Gallery support with plugin version and error details
 
 ## Changelog
 
@@ -298,6 +298,6 @@ GPL v2 or later
 
 ## Credits
 
-Developed for LooseGallery
+Developed for Loose Gallery
 Compatible with WooCommerce
 Built on WordPress

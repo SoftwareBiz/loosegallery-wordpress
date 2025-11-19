@@ -28,8 +28,8 @@ class LG_Admin_Settings {
      */
     public function add_settings_page() {
         add_menu_page(
-            __('LooseGallery Settings', 'loosegallery-woocommerce'),
-            __('LooseGallery', 'loosegallery-woocommerce'),
+            __('Loose Gallery Settings', 'loosegallery-woocommerce'),
+            __('Loose Gallery', 'loosegallery-woocommerce'),
             'manage_options',
             'loosegallery-settings',
             array($this, 'render_settings_page'),
@@ -123,7 +123,7 @@ class LG_Admin_Settings {
         $settings = get_option('loosegallery_woocommerce_settings', array());
         $api_keys = isset($settings['api_keys']) ? $settings['api_keys'] : array();
         ?>
-        <p><?php _e('Add your LooseGallery API keys to connect multiple domains. Each API key will display its associated domain name.', 'loosegallery-woocommerce'); ?></p>
+        <p><?php _e('Add your Loose Gallery API keys to connect multiple domains. Each API key will display its associated domain name.', 'loosegallery-woocommerce'); ?></p>
         
         <table class="form-table lg-api-keys-table">
             <tbody id="lg-api-keys-container">

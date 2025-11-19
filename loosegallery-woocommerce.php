@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: LooseGallery for WooCommerce
+ * Plugin Name: Loose Gallery for WooCommerce
  * Plugin URI: https://loosegallery.com
- * Description: Integrate LooseGallery design editor with WooCommerce products for custom product personalization. Uses GraphQL API.
+ * Description: Integrate Loose Gallery design editor with WooCommerce products for custom product personalization. Uses GraphQL API.
  * Version: 1.0.1
  * Author: SoftwareBiz
  * Author URI: https://softwarebiz.co
@@ -28,7 +28,7 @@ define('LG_WC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('LG_WC_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 /**
- * Main LooseGallery WooCommerce Plugin Class
+ * Main Loose Gallery WooCommerce Plugin Class
  */
 class LooseGallery_WooCommerce {
 
@@ -224,7 +224,7 @@ class LooseGallery_WooCommerce {
     public function woocommerce_missing_notice() {
         ?>
         <div class="error">
-            <p><?php _e('LooseGallery for WooCommerce requires WooCommerce to be installed and activated.', 'loosegallery-woocommerce'); ?></p>
+            <p><?php _e('Loose Gallery for WooCommerce requires WooCommerce to be installed and activated.', 'loosegallery-woocommerce'); ?></p>
         </div>
         <?php
     }
