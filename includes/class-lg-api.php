@@ -38,7 +38,7 @@ class LG_API {
     }
 
     /**
-     * Test API connection
+     * Test API connection and get domain info
      */
     public function test_connection() {
         if (empty($this->api_key)) {
@@ -48,23 +48,34 @@ class LG_API {
             );
         }
 
-        // Use getImageDataList query to test connection (doesn't require parameters)
+        // Extract domain ID from API key (first 9 characters)
+        $domain_id = substr($this->api_key, 0, 9);
+
+        // Use getAssets query to get domain information
         $query = '
-            query {
-                getImageDataList(itemsPerPage: 1, page: 0) {
-                    page
-                    totalItems
+            query GetAssets($assetPks: [String!]!, $fieldOptions: AWSJSON!) {
+                getAssets(assetPks: $assetPks, fieldOptions: $fieldOptions) {
+                    items
                 }
             }
         ';
 
-        $response = $this->make_graphql_request($query);
+        $variables = array(
+            'assetPks' => array('DOM#' . $domain_id),
+            'fieldOptions' => json_encode(array(
+                'domain_name' => (object)array()
+            ))
+        );
 
-        if ($response['success'] && isset($response['data']['getImageDataList'])) {
+        $response = $this->make_graphql_request($query, $variables);
+
+        if ($response['success'] && isset($response['data']['getAssets']['items'][0])) {
+            $domain_data = json_decode($response['data']['getAssets']['items'][0], true);
             return array(
                 'success' => true,
                 'message' => __('API connection successful', 'loosegallery-woocommerce'),
-                'total_items' => $response['data']['getImageDataList']['totalItems'] ?? 0
+                'domain_name' => $domain_data['domain_name'] ?? '',
+                'domain_id' => $domain_id
             );
         }
 

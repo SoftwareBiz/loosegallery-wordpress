@@ -71,6 +71,13 @@ class LG_Admin_Settings {
             $sanitized['api_keys'] = array();
         }
 
+        // Sanitize domain names
+        if (isset($input['domain_names']) && is_array($input['domain_names'])) {
+            $sanitized['domain_names'] = array_map('sanitize_text_field', $input['domain_names']);
+        } else {
+            $sanitized['domain_names'] = array();
+        }
+
         // Editor URL and return URL are hardcoded - no need to save them
         // Button customization removed - button now uses SVG image
 
@@ -200,7 +207,14 @@ class LG_Admin_Settings {
                         if (response.success) {
                             $status.html('<span style="color: #46b450;">✓ <?php _e('Connected', 'loosegallery-woocommerce'); ?></span>');
                             if (response.data.domain_name) {
-                                $domainName.text('<?php _e('Domain:', 'loosegallery-woocommerce'); ?> ' + response.data.domain_name);
+                                $domainName.text('<?php _e('Domain:', 'loosegallery-woocommerce'); ?> ' + response.data.domain_name + ' (ID: ' + response.data.domain_id + ')');
+                                // Save domain name in hidden field
+                                var $hiddenInput = $input.siblings('input[name="loosegallery_woocommerce_settings[domain_names][' + index + ']"]');
+                                if ($hiddenInput.length === 0) {
+                                    $input.after('<input type="hidden" name="loosegallery_woocommerce_settings[domain_names][' + index + ']" value="' + response.data.domain_name + '" />');
+                                } else {
+                                    $hiddenInput.val(response.data.domain_name);
+                                }
                             }
                         } else {
                             var errorMsg = response.data.message || '<?php _e('Connection failed', 'loosegallery-woocommerce'); ?>';
@@ -233,6 +247,12 @@ class LG_Admin_Settings {
      * Render single API key row
      */
     private function render_api_key_row($index, $api_key) {
+        $settings = get_option('loosegallery_woocommerce_settings', array());
+        $domain_name = isset($settings['domain_names'][$index]) ? $settings['domain_names'][$index] : '';
+        $domain_id = '';
+        if (!empty($api_key) && is_string($api_key)) {
+            $domain_id = substr($api_key, 0, 9);
+        }
         ?>
         <tr class="lg-api-key-row">
             <th scope="row">
@@ -244,6 +264,9 @@ class LG_Admin_Settings {
                        value="<?php echo esc_attr($api_key); ?>" 
                        class="regular-text lg-api-key-input" 
                        placeholder="<?php _e('Enter API key...', 'loosegallery-woocommerce'); ?>" />
+                <input type="hidden" 
+                       name="loosegallery_woocommerce_settings[domain_names][<?php echo $index; ?>]" 
+                       value="<?php echo esc_attr($domain_name); ?>" />
                 <button type="button" class="button lg-test-api-key" data-index="<?php echo $index; ?>">
                     <?php _e('Test Connection', 'loosegallery-woocommerce'); ?>
                 </button>
@@ -251,14 +274,15 @@ class LG_Admin_Settings {
                     <?php _e('Remove', 'loosegallery-woocommerce'); ?>
                 </button>
                 <span class="lg-api-status"></span>
-                <?php
-                // Show the domain id extracted from API key (first 9 characters) for admin clarity
-                $domain_id = '';
-                if (!empty($api_key) && is_string($api_key)) {
-                    $domain_id = substr($api_key, 0, 9);
-                }
-                ?>
-                <p class="description lg-domain-name"><?php echo $domain_id ? esc_html(sprintf(__('Domain ID: %s', 'loosegallery-woocommerce'), $domain_id)) : ''; ?></p>
+                <p class="description lg-domain-name">
+                    <?php 
+                    if ($domain_name && $domain_id) {
+                        echo esc_html(sprintf(__('Domain: %s (ID: %s)', 'loosegallery-woocommerce'), $domain_name, $domain_id));
+                    } else if ($domain_id) {
+                        echo esc_html(sprintf(__('Domain ID: %s', 'loosegallery-woocommerce'), $domain_id));
+                    }
+                    ?>
+                </p>
             </td>
         </tr>
         <?php
@@ -362,7 +386,8 @@ class LG_Admin_Settings {
         if ($result['success']) {
             wp_send_json_success(array(
                 'message' => __('API connection successful!', 'loosegallery-woocommerce'),
-                'total_items' => $result['total_items'] ?? 0
+                'domain_name' => $result['domain_name'] ?? '',
+                'domain_id' => $result['domain_id'] ?? ''
             ));
         } else {
             // Return detailed error information
