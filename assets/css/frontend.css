@@ -38,17 +38,26 @@
     padding: 0;
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
+    line-height: 0;
 }
 
 .lg-design-button:hover {
     transform: scale(1.05);
     opacity: 0.9;
+    background: none;
+}
+
+.lg-design-button:focus {
+    outline: none;
+    box-shadow: none;
+    background: none;
 }
 
 .lg-design-button-image {
     display: block;
     max-width: 300px;
     height: auto;
+    border: none;
 }
 
 .lg-design-status {
