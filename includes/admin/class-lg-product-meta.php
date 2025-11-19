@@ -82,20 +82,25 @@ class LG_Product_Meta {
                         <option value=""><?php _e('Select a domain...', 'loosegallery-woocommerce'); ?></option>
                         <?php
                         if (!empty($api_keys)) {
+                            $domain_names = isset($settings['domain_names']) ? $settings['domain_names'] : array();
+                            
                             foreach ($api_keys as $index => $api_key) {
                                 if (empty($api_key)) continue;
                                 
                                 // Extract domain ID from API key (first 9 characters)
                                 $domain_id = substr($api_key, 0, 9);
-                                $domain_name = "Domain " . ($index + 1);
                                 
-                                // Don't test connection here - too slow for product edit page
-                                // Just show domain ID
+                                // Use saved domain name if available, otherwise show Domain 1, 2, etc.
+                                if (!empty($domain_names[$index])) {
+                                    $display_name = $domain_names[$index] . ' (' . $domain_id . ')';
+                                } else {
+                                    $display_name = 'Domain ' . ($index + 1) . ' (' . $domain_id . ')';
+                                }
                                 ?>
                                 <option value="<?php echo esc_attr($domain_id); ?>" 
                                         data-api-key="<?php echo esc_attr($api_key); ?>"
                                         <?php selected($selected_domain, $domain_id); ?>>
-                                    <?php echo esc_html($domain_name . ' (' . $domain_id . ')'); ?>
+                                    <?php echo esc_html($display_name); ?>
                                 </option>
                                 <?php
                             }
