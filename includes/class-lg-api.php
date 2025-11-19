@@ -67,16 +67,29 @@ class LG_API {
 
         $response = $this->make_graphql_request($query, $variables);
 
+        // Debug logging
+        error_log('Loose Gallery test_connection - Full Response: ' . print_r($response, true));
+
         if ($response['success'] && isset($response['data']['getAssets']['items'][0])) {
-            $domain_data = json_decode($response['data']['getAssets']['items'][0], true);
+            $item_json = $response['data']['getAssets']['items'][0];
             
-            // Debug logging
-            error_log('Loose Gallery API - Domain Data: ' . print_r($domain_data, true));
+            // Debug the raw item
+            error_log('Loose Gallery test_connection - Raw Item JSON: ' . $item_json);
+            
+            $domain_data = json_decode($item_json, true);
+            
+            // Debug the decoded data
+            error_log('Loose Gallery test_connection - Decoded Domain Data: ' . print_r($domain_data, true));
+            
+            $domain_name = isset($domain_data['domain_name']) ? $domain_data['domain_name'] : '';
+            
+            error_log('Loose Gallery test_connection - Domain Name: ' . $domain_name);
+            error_log('Loose Gallery test_connection - Domain ID: ' . $domain_id);
             
             return array(
                 'success' => true,
                 'message' => __('API connection successful', 'loosegallery-woocommerce'),
-                'domain_name' => $domain_data['domain_name'] ?? '',
+                'domain_name' => $domain_name,
                 'domain_id' => $domain_id
             );
         }
