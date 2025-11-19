@@ -42,6 +42,7 @@
     line-height: 0 !important;
     box-shadow: none !important;
     font-size: 0 !important;
+    border-radius: 0 !important;
 }
 
 .lg-design-link:hover,
@@ -55,6 +56,7 @@
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
+    border-radius: 0 !important;
 }
 
 .lg-design-button-image {
@@ -64,6 +66,7 @@
     border: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    border-radius: 0 !important;
 }
 
 .lg-design-status {

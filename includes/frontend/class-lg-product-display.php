@@ -148,8 +148,8 @@ class LG_Product_Display {
         $svg_url = LG_WC_PLUGIN_URL . 'assets/images/letmeloose.svg';
         ?>
         <div class="lg-design-button-wrapper">
-            <a href="<?php echo esc_url($editor_url); ?>" class="lg-design-link" style="display: inline-block; background: none; border: none; padding: 0; text-decoration: none;">
-                <img src="<?php echo esc_url($svg_url); ?>" alt="Let Me Loose" class="lg-design-button-image" style="display: block; max-width: 300px; height: auto; border: none;" />
+            <a href="<?php echo esc_url($editor_url); ?>" class="lg-design-link" style="display: inline-block; background: none; border: none; padding: 0; text-decoration: none; border-radius: 0;">
+                <img src="<?php echo esc_url($svg_url); ?>" alt="Let Me Loose" class="lg-design-button-image" style="display: block; max-width: 300px; height: auto; border: none; border-radius: 0;" />
             </a>
         </div>
         <?php
