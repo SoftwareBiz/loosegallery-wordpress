@@ -3,7 +3,7 @@
  * Plugin Name: Loose Gallery for WooCommerce
  * Plugin URI: https://loosegallery.com
  * Description: Integrate Loose Gallery design editor with WooCommerce products for custom product personalization. Uses GraphQL API.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: SoftwareBiz
  * Author URI: https://softwarebiz.co
  * Text Domain: loosegallery-woocommerce
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('LG_WC_VERSION', '1.0.1');
+define('LG_WC_VERSION', '1.0.2');
 define('LG_WC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('LG_WC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('LG_WC_PLUGIN_BASENAME', plugin_basename(__FILE__));
