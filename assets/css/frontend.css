@@ -6,7 +6,7 @@
 .lg-customize-tag-wrapper {
     position: absolute;
     top: 25px;
-    right: -34px;
+    right: -24px;
     z-index: 10;
     pointer-events: none;
 }
