@@ -54,6 +54,49 @@
         $(this).text('Opening editor...').css('opacity', '0.6');
     });
 
+    // Preserve design preview when variation is selected
+    var designPreviewUrl = null;
+    
+    // Store the design preview URL if it exists
+    if ($('.woocommerce-product-gallery__image img').length > 0) {
+        var currentSrc = $('.woocommerce-product-gallery__image img').first().attr('src');
+        // Check if current image is a design preview (not from uploads directory)
+        if (currentSrc && currentSrc.indexOf('/uploads/') === -1 && currentSrc.indexOf('loosegallery.com') > -1) {
+            designPreviewUrl = currentSrc;
+        }
+    }
+    
+    // Listen for variation changes and restore design preview
+    $('form.variations_form').on('found_variation', function(event, variation) {
+        if (designPreviewUrl) {
+            setTimeout(function() {
+                // Replace all product gallery images with design preview
+                $('.woocommerce-product-gallery__image img').each(function() {
+                    $(this).attr('src', designPreviewUrl);
+                    $(this).attr('srcset', designPreviewUrl);
+                    if ($(this).attr('data-src')) {
+                        $(this).attr('data-src', designPreviewUrl);
+                    }
+                });
+            }, 10);
+        }
+    });
+    
+    // Also handle reset variations
+    $('form.variations_form').on('reset_data', function() {
+        if (designPreviewUrl) {
+            setTimeout(function() {
+                $('.woocommerce-product-gallery__image img').each(function() {
+                    $(this).attr('src', designPreviewUrl);
+                    $(this).attr('srcset', designPreviewUrl);
+                    if ($(this).attr('data-src')) {
+                        $(this).attr('data-src', designPreviewUrl);
+                    }
+                });
+            }, 10);
+        }
+    });
+
     // WooCommerce Blocks Checkout - Replace product images with design previews
     if (typeof lgDesignPreviews !== 'undefined' && lgDesignPreviews.length > 0) {
         var replaceCheckoutImages = function() {
