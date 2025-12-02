@@ -41,6 +41,9 @@ class LG_Product_Display {
 
         // Replace product image with design preview if available
         add_filter('woocommerce_single_product_image_thumbnail_html', array($this, 'replace_with_design_preview'), 10, 2);
+        
+        // Add design preview to product gallery
+        add_filter('woocommerce_product_get_gallery_image_ids', array($this, 'add_design_to_gallery'), 10, 2);
     }
 
     /**
@@ -322,6 +325,8 @@ class LG_Product_Display {
 
     /**
      * Replace product image with design preview if available
+     * Only replaces the FIRST image, leaves other thumbnails intact
+     * Also handles custom design thumbnail (-1 ID)
      */
     public function replace_with_design_preview($html, $attachment_id) {
         global $product;
@@ -345,6 +350,30 @@ class LG_Product_Display {
         }
 
         $preview_url = $design_data['data']['preview_url'];
+        
+        // Handle our custom design thumbnail (ID = -1)
+        if ($attachment_id == -1) {
+            return sprintf(
+                '<div data-thumb="%s" data-thumb-alt="%s" class="woocommerce-product-gallery__image"><a href="%s"><img width="800" height="800" src="%s" class="wp-post-image" alt="%s" loading="lazy" title="%s" data-caption="" data-src="%s" data-large_image="%s" data-large_image_width="800" data-large_image_height="800" /></a></div>',
+                esc_url($preview_url),
+                esc_attr($product->get_name() . ' - Your Design'),
+                esc_url($preview_url),
+                esc_url($preview_url),
+                esc_attr($product->get_name() . ' - Your Design'),
+                esc_attr($product->get_name() . ' - Your Design'),
+                esc_url($preview_url),
+                esc_url($preview_url)
+            );
+        }
+
+        // Get the product's featured image ID
+        $featured_image_id = $product->get_image_id();
+        
+        // Only replace if this is the featured image, not other gallery images
+        if ($attachment_id != $featured_image_id) {
+            return $html;
+        }
+
         $product_title = $product->get_name();
 
         // Replace src, srcset, and data-src attributes while preserving all HTML structure
@@ -367,6 +396,40 @@ class LG_Product_Display {
         );
 
         return $modified_html;
+    }
+
+    /**
+     * Add design preview as first thumbnail in product gallery
+     */
+    public function add_design_to_gallery($attachment_ids, $product) {
+        if (!$product) {
+            return $attachment_ids;
+        }
+
+        $product_id = $product->get_id();
+        
+        // Check if this product has a saved design
+        if (!$this->session->has_design($product_id)) {
+            return $attachment_ids;
+        }
+
+        $design_data = $this->session->get_design($product_id);
+        
+        // Check if we have a preview URL
+        if (!isset($design_data['data']['preview_url']) || empty($design_data['data']['preview_url'])) {
+            return $attachment_ids;
+        }
+
+        // Add a placeholder attachment ID for the design preview
+        // We'll use -1 to identify this as a custom design image
+        if (!is_array($attachment_ids)) {
+            $attachment_ids = array();
+        }
+        
+        // Add design preview as first thumbnail
+        array_unshift($attachment_ids, -1);
+        
+        return $attachment_ids;
     }
 
     /**
